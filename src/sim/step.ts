@@ -47,6 +47,10 @@ export const stepWorld = (
       trails,
     });
 
+    if (trailRes.trails !== trails) {
+      trails.splice(0, trails.length, ...trailRes.trails);
+    }
+
     const hit =
       outOfBounds(phys.pos, arenaHalf) || intersectsAny(p.pos, phys.pos, trails, time);
 

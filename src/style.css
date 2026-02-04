@@ -48,3 +48,66 @@ body {
   color: rgba(233, 242, 255, 0.7);
   font-size: 12px;
 }
+
+.menu {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 8, 13, 0.72);
+  backdrop-filter: blur(4px);
+}
+
+.menu-card {
+  width: min(360px, 90vw);
+  padding: 24px 28px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  background: rgba(8, 16, 24, 0.9);
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.25);
+  text-align: center;
+}
+
+.menu-card h2 {
+  margin: 0 0 8px;
+  letter-spacing: 0.08em;
+}
+
+.menu-sub {
+  margin: 0 0 18px;
+  color: rgba(233, 242, 255, 0.7);
+  font-size: 13px;
+}
+
+.menu-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+.menu-row strong {
+  color: #00f5ff;
+}
+
+.menu-hash {
+  margin: 12px 0 18px;
+  font-size: 11px;
+  color: rgba(233, 242, 255, 0.6);
+  word-break: break-all;
+}
+
+.menu button {
+  margin-top: 16px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(0, 255, 255, 0.4);
+  background: rgba(0, 245, 255, 0.1);
+  color: #e9f2ff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.menu button:hover {
+  background: rgba(0, 245, 255, 0.2);
+}

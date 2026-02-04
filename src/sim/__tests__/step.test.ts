@@ -1,7 +1,7 @@
 import { stepWorld } from "../step";
 import { vec2 } from "../math";
 
-test("stepWorld advances time", () => {
+test("stepWorld advances time and emits trails", () => {
   const world = {
     time: 0,
     players: [
@@ -22,4 +22,5 @@ test("stepWorld advances time", () => {
   };
   const next = stepWorld(world, { p1: 0 }, 1 / 60);
   expect(next.time).toBeGreaterThan(0);
+  expect(next.trails.length).toBeGreaterThan(0);
 });

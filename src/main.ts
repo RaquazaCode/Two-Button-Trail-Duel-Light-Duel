@@ -111,14 +111,19 @@ if (app) {
   const getInputs = () => {
     if (!world) return { p1: 0 };
     const inputs: Record<string, -1 | 0 | 1> = { p1: input };
+    const player = world.players.find((p) => p.id === "p1");
     world.players
       .filter((p) => p.id !== "p1")
       .forEach((bot) => {
         inputs[bot.id] = chooseBotInput({
+          id: bot.id,
           pos: bot.pos,
           heading: bot.heading,
+          turnVel: bot.turnVel,
           arenaHalf: world!.arenaHalf,
           trails: world!.trails,
+          time: world!.time,
+          playerPos: player?.pos,
         });
       });
     return inputs;

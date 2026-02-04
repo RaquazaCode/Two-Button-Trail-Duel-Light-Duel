@@ -12,7 +12,7 @@ export const createEnvironment = (
   arenaSize: number
 ) => {
   const layout = computeEnvironmentLayout(arenaSize);
-  scene.fog = new THREE.FogExp2(0x05080d, 0.0075);
+  scene.fog = new THREE.FogExp2(0x05080d, 0.006);
 
   const envTarget = new THREE.WebGLCubeRenderTarget(512, {
     format: THREE.RGBAFormat,
@@ -66,34 +66,54 @@ export const createEnvironment = (
     scene.add(skyline);
   });
 
-  const stadiumMaterial = new THREE.MeshStandardMaterial({
-    color: STADIUM_SETTINGS.color,
-    emissive: STADIUM_SETTINGS.emissive,
-    emissiveIntensity: STADIUM_SETTINGS.emissiveIntensity,
+  const baseMaterial = new THREE.MeshStandardMaterial({
+    color: STADIUM_SETTINGS.baseColor,
+    emissive: STADIUM_SETTINGS.baseEmissive,
+    emissiveIntensity: STADIUM_SETTINGS.baseIntensity,
     metalness: STADIUM_SETTINGS.metalness,
     roughness: STADIUM_SETTINGS.roughness,
   });
 
-  const stadiumWall = new THREE.Mesh(
-    new THREE.CylinderGeometry(
-      layout.stadiumRadius + layout.stadiumTube * 0.35,
-      layout.stadiumRadius + layout.stadiumTube * 0.35,
-      layout.stadiumHeight,
-      64,
-      1,
-      true
-    ),
-    stadiumMaterial
-  );
-  stadiumWall.position.y = layout.stadiumHeight * 0.5 - 0.2;
-  scene.add(stadiumWall);
+  const topMaterial = new THREE.MeshStandardMaterial({
+    color: STADIUM_SETTINGS.topColor,
+    emissive: STADIUM_SETTINGS.topEmissive,
+    emissiveIntensity: STADIUM_SETTINGS.topIntensity,
+    metalness: STADIUM_SETTINGS.metalness,
+    roughness: STADIUM_SETTINGS.roughness,
+  });
 
-  const stadiumRim = new THREE.Mesh(
-    new THREE.TorusGeometry(layout.stadiumRadius, layout.stadiumTube, 16, 64),
-    stadiumMaterial
+  const lowerHeight = layout.stadiumHeight * 0.6;
+  const upperHeight = layout.stadiumHeight * 0.4;
+
+  const lowerBand = new THREE.Mesh(
+    new THREE.CylinderGeometry(layout.stadiumRadius, layout.stadiumRadius, lowerHeight, 96, 1, true),
+    baseMaterial
   );
-  stadiumRim.rotation.x = Math.PI / 2;
-  scene.add(stadiumRim);
+  lowerBand.position.y = lowerHeight * 0.5 - 0.2;
+  scene.add(lowerBand);
+
+  const upperBand = new THREE.Mesh(
+    new THREE.CylinderGeometry(layout.stadiumRadius, layout.stadiumRadius, upperHeight, 96, 1, true),
+    topMaterial
+  );
+  upperBand.position.y = lowerHeight + upperHeight * 0.5 - 0.2;
+  scene.add(upperBand);
+
+  const rimMaterial = new THREE.MeshStandardMaterial({
+    color: STADIUM_SETTINGS.topColor,
+    emissive: STADIUM_SETTINGS.rimEmissive,
+    emissiveIntensity: STADIUM_SETTINGS.rimIntensity,
+    metalness: STADIUM_SETTINGS.metalness,
+    roughness: STADIUM_SETTINGS.roughness,
+  });
+
+  const rim = new THREE.Mesh(
+    new THREE.TorusGeometry(layout.stadiumRadius, layout.stadiumTube * 0.25, 16, 96),
+    rimMaterial
+  );
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = layout.stadiumHeight - 0.2;
+  scene.add(rim);
 
   const gate = createEnvUpdateGate({ stride: 5, maxFrameMs: 40, sampleSize: 5 });
 

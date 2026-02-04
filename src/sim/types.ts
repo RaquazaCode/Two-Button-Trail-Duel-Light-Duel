@@ -1,0 +1,32 @@
+import type { Vec2 } from "./math";
+
+export type PlayerId = string;
+
+export type PlayerState = {
+  id: PlayerId;
+  pos: Vec2;
+  heading: number;
+  turnVel: number;
+  alive: boolean;
+  gapTimer: number;
+  gapOn: boolean;
+  trailId: number;
+  eliminatedAt?: number;
+};
+
+export type TrailSegment = {
+  id: number;
+  owner: PlayerId;
+  start: Vec2;
+  end: Vec2;
+  createdAt: number;
+  solidAt: number;
+};
+
+export type WorldState = {
+  time: number;
+  players: PlayerState[];
+  trails: TrailSegment[];
+  arenaHalf: number;
+  running: boolean;
+};

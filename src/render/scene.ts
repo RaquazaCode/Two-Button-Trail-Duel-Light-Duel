@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { createEnvironment } from "./environment";
 
 export const createScene = (container: HTMLElement) => {
   const scene = new THREE.Scene();
@@ -18,26 +19,12 @@ export const createScene = (container: HTMLElement) => {
   renderer.setSize(container.clientWidth, container.clientHeight);
   container.appendChild(renderer.domElement);
 
-  const grid = new THREE.GridHelper(100, 20, 0x00f5ff, 0x0d2a36);
-  (grid.material as THREE.Material).transparent = true;
-  (grid.material as THREE.Material).opacity = 0.8;
-  scene.add(grid);
-
-  const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(100, 100),
-    new THREE.MeshStandardMaterial({
-      color: 0x061018,
-      metalness: 0.2,
-      roughness: 0.4,
-    })
-  );
-  plane.rotation.x = -Math.PI / 2;
-  scene.add(plane);
-
-  const ambient = new THREE.AmbientLight(0x66ccff, 0.6);
-  const key = new THREE.DirectionalLight(0xffffff, 0.6);
-  key.position.set(40, 80, 20);
+  const ambient = new THREE.HemisphereLight(0x66ccff, 0x070b12, 0.65);
+  const key = new THREE.DirectionalLight(0xb7e6ff, 0.5);
+  key.position.set(40, 80, 30);
   scene.add(ambient, key);
+
+  const environment = createEnvironment(scene, renderer);
 
   const resize = () => {
     const { clientWidth, clientHeight } = container;
@@ -46,5 +33,5 @@ export const createScene = (container: HTMLElement) => {
     renderer.setSize(clientWidth, clientHeight);
   };
 
-  return { scene, camera, renderer, resize };
+  return { scene, camera, renderer, resize, environment };
 };

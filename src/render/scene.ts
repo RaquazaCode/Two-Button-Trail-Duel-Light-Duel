@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import { createEnvironment } from "./environment";
+import { getCameraFar, getPixelRatio } from "./sceneConfig";
 
 export type SceneOptions = {
   arenaSize: number;
@@ -13,13 +14,13 @@ export const createScene = (container: HTMLElement, options: SceneOptions) => {
     45,
     container.clientWidth / container.clientHeight,
     0.1,
-    900
+    getCameraFar(options.arenaSize)
   );
   camera.position.set(0, 70, 95);
   camera.lookAt(0, 0, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(window.devicePixelRatio || 1);
+  renderer.setPixelRatio(getPixelRatio(window.devicePixelRatio));
   renderer.setSize(container.clientWidth, container.clientHeight);
   container.appendChild(renderer.domElement);
 

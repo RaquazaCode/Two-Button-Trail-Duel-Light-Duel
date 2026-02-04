@@ -24,6 +24,7 @@ export const computeEnvironmentLayout = (arenaSize: number): EnvironmentLayout =
   const arenaHalf = arenaSize / 2;
   const gridCell = 10;
   const gridMajorEvery = 5;
+  const capCount = (value: number) => Math.min(140, Math.max(28, value));
 
   return {
     arenaHalf,
@@ -39,7 +40,7 @@ export const computeEnvironmentLayout = (arenaSize: number): EnvironmentLayout =
     skylineLayers: [
       {
         radius: arenaHalf * 2.2,
-        count: Math.max(28, Math.round(arenaSize / 7)),
+        count: capCount(Math.round(arenaSize / 7)),
         minHeight: 26,
         maxHeight: 70,
         opacity: 0.9,
@@ -48,7 +49,7 @@ export const computeEnvironmentLayout = (arenaSize: number): EnvironmentLayout =
       },
       {
         radius: arenaHalf * 3.2,
-        count: Math.max(34, Math.round(arenaSize / 6)),
+        count: capCount(Math.round(arenaSize / 6)),
         minHeight: 34,
         maxHeight: 90,
         opacity: 0.7,
@@ -57,7 +58,7 @@ export const computeEnvironmentLayout = (arenaSize: number): EnvironmentLayout =
       },
       {
         radius: arenaHalf * 4.4,
-        count: Math.max(40, Math.round(arenaSize / 5)),
+        count: capCount(Math.round(arenaSize / 5)),
         minHeight: 40,
         maxHeight: 110,
         opacity: 0.5,

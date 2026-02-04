@@ -40,3 +40,29 @@ test("createSkyline builds a ring of buildings", () => {
     expect(billboardMeshes.length).toBeGreaterThanOrEqual(2);
   });
 });
+
+test("createSkyline keeps billboards from overpowering glare", () => {
+  const skyline = createSkyline({
+    radius: 60,
+    count: 6,
+    minHeight: 10,
+    maxHeight: 30,
+    color: 0x0d1824,
+    emissive: 0x3af7ff,
+    billboardCount: 1,
+  });
+
+  const billboardMeshes: THREE.Mesh[] = [];
+  skyline.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    if (child.geometry.type === "PlaneGeometry") {
+      billboardMeshes.push(child);
+    }
+  });
+
+  expect(billboardMeshes.length).toBeGreaterThan(0);
+  billboardMeshes.forEach((mesh) => {
+    const material = mesh.material as THREE.MeshStandardMaterial;
+    expect(material.emissiveIntensity).toBeLessThanOrEqual(0.9);
+  });
+});

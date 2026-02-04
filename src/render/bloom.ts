@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { BLOOM_SETTINGS } from "./bloomConfig";
 
 export const createBloomComposer = (
   renderer: THREE.WebGLRenderer,
@@ -13,9 +14,9 @@ export const createBloomComposer = (
 
   const bloomPass = new UnrealBloomPass(
     new THREE.Vector2(renderer.domElement.width, renderer.domElement.height),
-    0.9,
-    0.8,
-    0.2
+    BLOOM_SETTINGS.strength,
+    BLOOM_SETTINGS.radius,
+    BLOOM_SETTINGS.threshold
   );
   composer.addPass(bloomPass);
 

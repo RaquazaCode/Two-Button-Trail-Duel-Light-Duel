@@ -24,3 +24,6 @@ TODO:
 - 2026-02-04: Fixed invisible trails/random deaths by keying trail meshes per owner+id, adding per-player trail colors, and skipping abnormal long segments in sim/render; added elimination reasons + outcome evaluation (ends on player death), short bike fade, and clearer result overlay copy; restored round countdown HUD.
 - 2026-02-04: Beefed up Tron-style bike silhouette (longer body + big wheels), tuned gentler camera roll, thickened/brightened danger ring, and added autostart query flag for Playwright.
 - 2026-02-04: Playwright autostart captures in output/web-game-visual-pass-autostart (shots 0-1) showing gameplay with colored bikes and HUD.
+- 2026-02-04: Set trails to continuous (gapOff=0), split long segments in sim to avoid flashes, and use trailWidth for render geometry. Arena size 10x (2500) and bike speed increased (24).
+- 2026-02-04: Performance pass: clamp renderer pixel ratio, reuse trail geometry, cap skyline counts, and add camera far scaling. Reduced billboard glare and bloom intensity; moved stadium material to config.
+- 2026-02-04: Autostart Playwright captures in output/web-game-visual-pass-autostart-3 and output/web-game-visual-pass-autostart-4 (gameplay shots).

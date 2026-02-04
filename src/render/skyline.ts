@@ -55,7 +55,7 @@ export const createSkyline = (args: SkylineArgs) => {
     const billboardMaterial = new THREE.MeshStandardMaterial({
       color: 0x0b1018,
       emissive: billboardColor,
-      emissiveIntensity: 1.6,
+      emissiveIntensity: 0.8,
       metalness: 0.1,
       roughness: 0.25,
       side: THREE.DoubleSide,

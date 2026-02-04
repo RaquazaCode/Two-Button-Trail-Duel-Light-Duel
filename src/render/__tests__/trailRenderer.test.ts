@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { vec2 } from "../../sim/math";
 import { createTrailRenderer } from "../trails";
 import { getPlayerColor } from "../palette";
+import { CONFIG } from "../../sim/config";
 
 test("trail renderer colors segments per player and can reset", () => {
   const scene = new THREE.Scene();
@@ -50,4 +51,25 @@ test("trail renderer skips abnormal long segments", () => {
   ]);
 
   expect(scene.children.length).toBe(0);
+});
+
+test("trail renderer uses configured width and height", () => {
+  const scene = new THREE.Scene();
+  const renderer = createTrailRenderer(scene);
+  renderer.update([
+    {
+      id: 2,
+      owner: "p1",
+      start: vec2(0, 0),
+      end: vec2(2, 0),
+      createdAt: 0,
+      solidAt: 0,
+    },
+  ]);
+
+  const mesh = scene.children.find((child) => child instanceof THREE.Mesh) as THREE.Mesh;
+  const geometry = mesh.geometry as THREE.BoxGeometry;
+  expect(mesh.scale.x).toBeCloseTo(2);
+  expect(geometry.parameters.depth).toBeCloseTo(CONFIG.trailWidth);
+  expect(geometry.parameters.height).toBeCloseTo(CONFIG.trailWidth * 0.2);
 });

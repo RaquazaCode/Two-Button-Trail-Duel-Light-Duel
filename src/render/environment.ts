@@ -4,6 +4,7 @@ import { createReflectiveFloor } from "./floor";
 import { createGridOverlay } from "./grid";
 import { computeEnvironmentLayout } from "./environmentLayout";
 import { createSkyline } from "./skyline";
+import { STADIUM_SETTINGS } from "./stadiumConfig";
 
 export const createEnvironment = (
   scene: THREE.Scene,
@@ -66,11 +67,11 @@ export const createEnvironment = (
   });
 
   const stadiumMaterial = new THREE.MeshStandardMaterial({
-    color: 0x3a1208,
-    emissive: 0xff3b1a,
-    emissiveIntensity: 1.4,
-    metalness: 0.35,
-    roughness: 0.35,
+    color: STADIUM_SETTINGS.color,
+    emissive: STADIUM_SETTINGS.emissive,
+    emissiveIntensity: STADIUM_SETTINGS.emissiveIntensity,
+    metalness: STADIUM_SETTINGS.metalness,
+    roughness: STADIUM_SETTINGS.roughness,
   });
 
   const stadiumWall = new THREE.Mesh(

@@ -14,3 +14,11 @@ test("computeEnvironmentLayout scales arena visuals", () => {
   expect(layout.skylineLayers[1].radius).toBeCloseTo(400);
   expect(layout.skylineLayers[2].radius).toBeCloseTo(550);
 });
+
+test("computeEnvironmentLayout caps skyline counts for huge arenas", () => {
+  const layout = computeEnvironmentLayout(2500);
+
+  layout.skylineLayers.forEach((layer) => {
+    expect(layer.count).toBeLessThanOrEqual(140);
+  });
+});

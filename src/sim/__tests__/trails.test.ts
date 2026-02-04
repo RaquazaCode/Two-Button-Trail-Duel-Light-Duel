@@ -1,23 +1,23 @@
 import { updateTrail } from "../trails";
 import { vec2 } from "../math";
 
-test("trail respects gap cadence", () => {
+test("trail renders continuously when gapOff is zero", () => {
   const res = updateTrail({
     prev: vec2(0, 0),
     next: vec2(1, 0),
     time: 2.05,
     gapOn: 2.0,
-    gapOff: 0.2,
+    gapOff: 0,
     solidifyDelay: 0.2,
     state: { gapTimer: 2.05, gapOnState: true, trailId: 1 },
     owner: "p1",
     trails: [],
   });
 
-  expect(res.trails.length).toBe(0); // in off window
+  expect(res.trails.length).toBe(1);
 });
 
-test("trail skips abnormal long segments", () => {
+test("trail splits abnormal long segments into smaller pieces", () => {
   const res = updateTrail({
     prev: vec2(0, 0),
     next: vec2(100, 0),
@@ -30,5 +30,7 @@ test("trail skips abnormal long segments", () => {
     trails: [],
   });
 
-  expect(res.trails.length).toBe(0);
+  expect(res.trails.length).toBeGreaterThan(1);
+  expect(res.trails[0].start).toEqual(vec2(0, 0));
+  expect(res.trails[res.trails.length - 1].end).toEqual(vec2(100, 0));
 });

@@ -3,18 +3,37 @@ import { CONFIG } from "./sim/config";
 import { vec2 } from "./sim/math";
 import type { WorldState } from "./sim/types";
 import { createGameLoop } from "./game/loop";
+import { createScene } from "./render/scene";
+import { createBloomComposer } from "./render/bloom";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
 if (app) {
   app.innerHTML = `
-    <div class="boot">
+    <div id="stage"></div>
+    <div class="hud">
       <h1>Light Duel</h1>
       <p id="status">Initializing...</p>
     </div>
   `;
 
+  const stage = document.querySelector<HTMLDivElement>("#stage");
   const status = document.querySelector<HTMLParagraphElement>("#status");
+
+  if (!stage) {
+    throw new Error("Stage container not found");
+  }
+
+  const { scene, camera, renderer, resize } = createScene(stage);
+  const { composer, resize: resizeBloom } = createBloomComposer(renderer, scene, camera);
+
+  const onResize = () => {
+    resize();
+    resizeBloom(stage.clientWidth, stage.clientHeight);
+  };
+
+  window.addEventListener("resize", onResize);
+  onResize();
 
   const world: WorldState = {
     time: 0,
@@ -59,5 +78,6 @@ if (app) {
         1
       )}, ${next.players[0].pos.y.toFixed(1)})`;
     }
+    composer.render();
   });
 }

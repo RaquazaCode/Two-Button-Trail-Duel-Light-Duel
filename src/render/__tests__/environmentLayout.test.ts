@@ -9,5 +9,8 @@ test("computeEnvironmentLayout scales arena visuals", () => {
   expect(layout.stadiumRadius).toBeCloseTo(127.5);
   expect(layout.stadiumTube).toBeCloseTo(4);
   expect(layout.stadiumHeight).toBeCloseTo(8);
-  expect(layout.skylineRadius).toBeCloseTo(400);
+  expect(layout.skylineLayers.length).toBe(3);
+  expect(layout.skylineLayers[0].radius).toBeCloseTo(275);
+  expect(layout.skylineLayers[1].radius).toBeCloseTo(400);
+  expect(layout.skylineLayers[2].radius).toBeCloseTo(550);
 });

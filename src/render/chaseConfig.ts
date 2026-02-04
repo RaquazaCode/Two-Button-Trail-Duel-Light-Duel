@@ -6,7 +6,7 @@ export const CHASE_CONFIG: ChaseConfig = {
   lookAhead: 26,
   shoulder: 2.2,
   smoothing: 7,
-  rollFactor: 0.18,
-  rollMax: 0.12,
-  rollSmoothing: 12,
+  rollFactor: 0.12,
+  rollMax: 0.08,
+  rollSmoothing: 14,
 };

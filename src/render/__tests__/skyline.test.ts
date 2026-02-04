@@ -9,6 +9,8 @@ test("createSkyline builds a ring of buildings", () => {
     maxHeight: 28,
     color: 0x0b1620,
     emissive: 0x00f5ff,
+    stripCount: 2,
+    billboardCount: 2,
   });
 
   expect(skyline).toBeInstanceOf(THREE.Group);
@@ -31,5 +33,10 @@ test("createSkyline builds a ring of buildings", () => {
       return material.emissiveIntensity != null && material.emissiveIntensity > 0.5;
     });
     expect(emissiveCount.length).toBeGreaterThan(0);
+
+    const billboardMeshes = child.children.filter(
+      (mesh) => mesh instanceof THREE.Mesh && mesh.geometry.type === "PlaneGeometry"
+    );
+    expect(billboardMeshes.length).toBeGreaterThanOrEqual(2);
   });
 });

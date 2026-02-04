@@ -11,7 +11,7 @@ export const createEnvironment = (
   arenaSize: number
 ) => {
   const layout = computeEnvironmentLayout(arenaSize);
-  scene.fog = new THREE.FogExp2(0x05080d, 0.006);
+  scene.fog = new THREE.FogExp2(0x05080d, 0.0075);
 
   const envTarget = new THREE.WebGLCubeRenderTarget(512, {
     format: THREE.RGBAFormat,
@@ -43,21 +43,27 @@ export const createEnvironment = (
   grid.position.y = 0.03;
   scene.add(grid);
 
-  const skyline = createSkyline({
-    radius: layout.skylineRadius,
-    count: layout.skylineCount,
-    minHeight: 18,
-    maxHeight: 46,
-    color: 0x101e2a,
-    emissive: 0x3af7ff,
+  layout.skylineLayers.forEach((layer, index) => {
+    const skyline = createSkyline({
+      radius: layer.radius,
+      count: layer.count,
+      minHeight: layer.minHeight,
+      maxHeight: layer.maxHeight,
+      color: 0x0d1824,
+      emissive: 0x3af7ff,
+      opacity: layer.opacity,
+      stripCount: layer.stripCount,
+      billboardCount: layer.billboardCount,
+      billboardColor: index === 0 ? 0xffd26e : index === 1 ? 0xff79c6 : 0x7cf8ff,
+    });
+    skyline.children.forEach((child) => {
+      const mesh = child as THREE.Mesh;
+      if (mesh.material && (mesh.material as THREE.MeshStandardMaterial).emissiveIntensity != null) {
+        (mesh.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.55 + index * 0.15;
+      }
+    });
+    scene.add(skyline);
   });
-  skyline.children.forEach((child) => {
-    const mesh = child as THREE.Mesh;
-    if (mesh.material && (mesh.material as THREE.MeshStandardMaterial).emissiveIntensity != null) {
-      (mesh.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.55;
-    }
-  });
-  scene.add(skyline);
 
   const stadiumMaterial = new THREE.MeshStandardMaterial({
     color: 0x2a1208,

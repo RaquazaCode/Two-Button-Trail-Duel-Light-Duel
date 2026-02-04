@@ -98,6 +98,7 @@ if (app) {
       alive: next.players.filter((p) => p.alive).length,
       total: next.players.length,
       mode,
+      roundDuration: CONFIG.roundDuration,
     });
     composer.render();
   };
@@ -162,7 +163,8 @@ if (app) {
 
   const finishMatch = (next: WorldState) => {
     const alive = next.players.filter((player) => player.alive);
-    if (alive.length > 1) return;
+    const timeUp = next.time >= CONFIG.roundDuration;
+    if (!timeUp && alive.length > 1) return;
 
     loop?.stop();
     loop = null;
@@ -171,10 +173,13 @@ if (app) {
 
     const winner = alive[0]?.id ?? "none";
     const hash = `${winner}-${Math.floor(next.time * 1000)}`;
+    const playerAlive = alive.some((player) => player.id === "p1");
+    const status = timeUp ? "TIME_UP" : playerAlive ? "VICTORY" : "ELIMINATED";
     const result = createResult({
       winner,
       hash,
       payout: winner === "p1" ? 0.45 : 0,
+      status,
     });
     result.mount(app);
     result.onRestart(() => {
@@ -189,6 +194,8 @@ if (app) {
     void connection?.leave();
     connection = null;
     lastFrame = performance.now();
+    trailRenderer.reset();
+    bikeRenderer.reset();
 
     input = 0;
     bindInputHandlers();

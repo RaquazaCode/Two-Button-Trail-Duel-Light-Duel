@@ -20,3 +20,4 @@ TODO:
 - 2026-02-04: Added spring-smoothed chase camera controller (over-the-shoulder). Playwright captures: /private/tmp/light-duel-web-game-chase.
 - 2026-02-04: Updated sim tuning to Balanced preset (arena 250, speed 16, shrink 50–150s), added shader-based grid overlay + environment layout scaling, and added camera roll + narrower FOV. Playwright captures: output/web-game/shot-0.png to shot-2.png.
 - 2026-02-04: Added aerodynamic bike model, skyline building accents, thicker/brighter danger ring, and gentler camera roll. Playwright captures: output/web-game-bike-skyline/shot-0.png to shot-2.png.
+- 2026-02-04: Rebuilt bike into Tron-style long profile with neon rims, added per-player palette for bikes/trails, added round countdown HUD + match-end reasons, layered skyline with billboards/strips, thicker danger wall/rim, and tuned camera roll down. Playwright captures: output/web-game-fixes/shot-0.png to shot-2.png.

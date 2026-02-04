@@ -1,17 +1,21 @@
 import * as THREE from "three";
 import { createEnvironment } from "./environment";
 
-export const createScene = (container: HTMLElement) => {
+export type SceneOptions = {
+  arenaSize: number;
+};
+
+export const createScene = (container: HTMLElement, options: SceneOptions) => {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0x05080d);
 
   const camera = new THREE.PerspectiveCamera(
-    55,
+    45,
     container.clientWidth / container.clientHeight,
     0.1,
-    500
+    900
   );
-  camera.position.set(0, 95, 110);
+  camera.position.set(0, 70, 95);
   camera.lookAt(0, 0, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -19,12 +23,12 @@ export const createScene = (container: HTMLElement) => {
   renderer.setSize(container.clientWidth, container.clientHeight);
   container.appendChild(renderer.domElement);
 
-  const ambient = new THREE.HemisphereLight(0x9fe8ff, 0x10161c, 1.25);
-  const key = new THREE.DirectionalLight(0xcff4ff, 1.15);
-  key.position.set(40, 90, 40);
+  const ambient = new THREE.HemisphereLight(0xb9f2ff, 0x121820, 1.35);
+  const key = new THREE.DirectionalLight(0xe6fbff, 1.25);
+  key.position.set(55, 95, 55);
   scene.add(ambient, key);
 
-  const environment = createEnvironment(scene, renderer);
+  const environment = createEnvironment(scene, renderer, options.arenaSize);
 
   const resize = () => {
     const { clientWidth, clientHeight } = container;

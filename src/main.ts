@@ -59,17 +59,22 @@ if (app) {
     throw new Error("Stage container not found");
   }
 
-  const { scene, camera, renderer, resize, environment } = createScene(stage);
+  const { scene, camera, renderer, resize, environment } = createScene(stage, {
+    arenaSize: CONFIG.arenaSize,
+  });
   const { composer, resize: resizeBloom } = createBloomComposer(renderer, scene, camera);
   const bikeRenderer = createBikeRenderer(scene);
   const trailRenderer = createTrailRenderer(scene);
   const hud = createHUD();
   const chaseCamera = createChaseCameraController(camera, {
-    height: 10,
-    distance: 18,
-    lookAhead: 14,
-    shoulder: 2,
-    smoothing: 6,
+    height: 6,
+    distance: 16,
+    lookAhead: 26,
+    shoulder: 2.2,
+    smoothing: 7,
+    rollFactor: 0.35,
+    rollMax: 0.25,
+    rollSmoothing: 10,
   });
 
   const onResize = () => {

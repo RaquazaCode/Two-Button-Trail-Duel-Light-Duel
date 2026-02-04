@@ -1,10 +1,17 @@
 import * as THREE from "three";
 import { createEnvUpdateGate } from "./envGate";
 import { createReflectiveFloor } from "./floor";
+import { createGridOverlay } from "./grid";
+import { computeEnvironmentLayout } from "./environmentLayout";
 import { createSkyline } from "./skyline";
 
-export const createEnvironment = (scene: THREE.Scene, renderer: THREE.WebGLRenderer) => {
-  scene.fog = new THREE.FogExp2(0x05080d, 0.01);
+export const createEnvironment = (
+  scene: THREE.Scene,
+  renderer: THREE.WebGLRenderer,
+  arenaSize: number
+) => {
+  const layout = computeEnvironmentLayout(arenaSize);
+  scene.fog = new THREE.FogExp2(0x05080d, 0.006);
 
   const envTarget = new THREE.WebGLCubeRenderTarget(512, {
     format: THREE.RGBAFormat,
@@ -15,25 +22,32 @@ export const createEnvironment = (scene: THREE.Scene, renderer: THREE.WebGLRende
   scene.add(cubeCamera);
 
   const floor = createReflectiveFloor({
-    size: 260,
+    size: layout.floorSize,
     envMap: envTarget.texture,
-    roughness: 0.08,
-    envMapIntensity: 1.6,
-    color: 0x0a121c,
+    roughness: 0.06,
+    envMapIntensity: 1.8,
+    color: 0x0b141f,
   });
   scene.add(floor);
 
-  const grid = new THREE.GridHelper(220, 24, 0x3af7ff, 0x1a4b5d);
-  (grid.material as THREE.Material).transparent = true;
-  (grid.material as THREE.Material).opacity = 0.35;
-  grid.position.y = 0.02;
+  const grid = createGridOverlay({
+    size: layout.gridSize,
+    cellSize: layout.gridCell,
+    majorEvery: layout.gridMajorEvery,
+    minorLine: layout.gridMinorLine,
+    majorLine: layout.gridMajorLine,
+    minorColor: 0x3af7ff,
+    majorColor: 0xf5fbff,
+    opacity: 0.95,
+  });
+  grid.position.y = 0.03;
   scene.add(grid);
 
   const skyline = createSkyline({
-    radius: 140,
-    count: 28,
-    minHeight: 14,
-    maxHeight: 36,
+    radius: layout.skylineRadius,
+    count: layout.skylineCount,
+    minHeight: 18,
+    maxHeight: 46,
     color: 0x101e2a,
     emissive: 0x3af7ff,
   });
@@ -46,11 +60,11 @@ export const createEnvironment = (scene: THREE.Scene, renderer: THREE.WebGLRende
   scene.add(skyline);
 
   const stadium = new THREE.Mesh(
-    new THREE.TorusGeometry(95, 2.5, 12, 48),
+    new THREE.TorusGeometry(layout.stadiumRadius, 3, 16, 64),
     new THREE.MeshStandardMaterial({
       color: 0x1a0d08,
       emissive: 0xff8a1f,
-      emissiveIntensity: 0.75,
+      emissiveIntensity: 0.85,
       metalness: 0.4,
       roughness: 0.45,
     })

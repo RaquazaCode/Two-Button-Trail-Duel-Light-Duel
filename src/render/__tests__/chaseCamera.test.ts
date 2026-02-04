@@ -1,4 +1,4 @@
-import { computeChaseCamera } from "../chaseCamera";
+import { computeCameraRoll, computeChaseCamera } from "../chaseCamera";
 
 test("computeChaseCamera positions camera behind heading", () => {
   const result = computeChaseCamera({
@@ -31,4 +31,11 @@ test("computeChaseCamera respects heading rotation", () => {
   expect(result.position.z).toBeCloseTo(-5);
   expect(result.target.x).toBeCloseTo(5);
   expect(result.target.z).toBeCloseTo(11);
+});
+
+test("computeCameraRoll clamps and scales turn velocity", () => {
+  expect(computeCameraRoll(0, 0.2, 0.4)).toBeCloseTo(0);
+  expect(computeCameraRoll(1, 0.2, 0.4)).toBeCloseTo(0.2);
+  expect(computeCameraRoll(5, 0.2, 0.4)).toBeCloseTo(0.4);
+  expect(computeCameraRoll(-5, 0.2, 0.4)).toBeCloseTo(-0.4);
 });

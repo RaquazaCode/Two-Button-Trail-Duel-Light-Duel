@@ -7,6 +7,16 @@ export type ChaseConfig = {
   lookAhead: number;
   shoulder: number;
   smoothing: number;
+  rollFactor: number;
+  rollMax: number;
+  rollSmoothing: number;
+};
+
+export const computeCameraRoll = (turnVel: number, rollFactor: number, rollMax: number) => {
+  const raw = turnVel * rollFactor;
+  if (raw > rollMax) return rollMax;
+  if (raw < -rollMax) return -rollMax;
+  return raw;
 };
 
 export const computeChaseCamera = (args: {
@@ -43,6 +53,7 @@ export const createChaseCameraController = (
 ) => {
   const currentPos = new THREE.Vector3();
   const currentTarget = new THREE.Vector3();
+  let currentRoll = 0;
   let initialized = false;
 
   const update = (world: WorldState | null, dt: number) => {
@@ -61,19 +72,24 @@ export const createChaseCameraController = (
 
     const desiredPos = new THREE.Vector3(desired.position.x, desired.position.y, desired.position.z);
     const desiredTarget = new THREE.Vector3(desired.target.x, desired.target.y, desired.target.z);
+    const desiredRoll = computeCameraRoll(player.turnVel ?? 0, config.rollFactor, config.rollMax);
 
     if (!initialized) {
       currentPos.copy(desiredPos);
       currentTarget.copy(desiredTarget);
+      currentRoll = desiredRoll;
       initialized = true;
     } else {
       const alpha = 1 - Math.exp(-config.smoothing * dt);
       currentPos.lerp(desiredPos, alpha);
       currentTarget.lerp(desiredTarget, alpha);
+      const rollAlpha = 1 - Math.exp(-config.rollSmoothing * dt);
+      currentRoll += (desiredRoll - currentRoll) * rollAlpha;
     }
 
     camera.position.copy(currentPos);
     camera.lookAt(currentTarget);
+    camera.rotation.z += currentRoll;
   };
 
   return { update };

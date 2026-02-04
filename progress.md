@@ -12,3 +12,4 @@ TODO:
 - 2026-02-04: Added Colyseus server scaffolding + LightDuelRoom sim loop with input/snapshot helpers and tests.
 - 2026-02-04: Added client net adapter (snapshot mapping, input message mapping) plus ServerSnapshot type and config toggle.
 - 2026-02-04: HUD now shows mode (LOCAL/ONLINE) with formatStatus helper + test. Playwright run captured screenshots in /private/tmp/light-duel-web-game-mode.
+- 2026-02-04: Added menu mode toggle (LOCAL/ONLINE) with mode helpers + test. Playwright captures in /private/tmp/light-duel-web-game-toggle-menu and /private/tmp/light-duel-web-game-toggle-online.

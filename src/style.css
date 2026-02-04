@@ -86,6 +86,38 @@ body {
   font-size: 14px;
 }
 
+.menu-row.menu-mode {
+  align-items: center;
+  gap: 12px;
+}
+
+.mode-toggle {
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  background: rgba(7, 13, 20, 0.9);
+}
+
+.mode-button {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(233, 242, 255, 0.7);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.mode-button.active {
+  border-color: rgba(0, 255, 255, 0.55);
+  background: rgba(0, 245, 255, 0.12);
+  color: #e9f2ff;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.25);
+}
+
 .menu-row strong {
   color: #00f5ff;
 }

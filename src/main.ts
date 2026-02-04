@@ -8,7 +8,7 @@ import { createBloomComposer } from "./render/bloom";
 import { createBikeRenderer } from "./render/bike";
 import { createTrailRenderer } from "./render/trails";
 import { createHUD } from "./ui/hud";
-import { createMenu, createResult } from "./ui/menu";
+import { createMenu, createResult, modeToUseServer, type ModeOption } from "./ui/menu";
 import { chooseBotInput } from "./sim/bot";
 import { renderGameToText } from "./game/telemetry";
 import { advanceWorld } from "./game/time";
@@ -70,6 +70,7 @@ if (app) {
   let world: WorldState | null = null;
   let input: -1 | 0 | 1 = 0;
   let connection: LightDuelConnection | null = null;
+  let mode: ModeOption = CONFIG.useServer ? "ONLINE" : "LOCAL";
 
   const applyWorld = (next: WorldState) => {
     bikeRenderer.update(next.players);
@@ -78,7 +79,7 @@ if (app) {
       time: next.time,
       alive: next.players.filter((p) => p.alive).length,
       total: next.players.length,
-      mode: CONFIG.useServer ? "ONLINE" : "LOCAL",
+      mode,
     });
     composer.render();
   };
@@ -107,7 +108,7 @@ if (app) {
   };
 
   window.advanceTime = (ms: number) => {
-    if (CONFIG.useServer) return;
+    if (modeToUseServer(mode)) return;
     if (!world) return;
     loop?.stop();
     world = advanceWorld(world, getInputs(), ms, 1 / CONFIG.simHz);
@@ -173,7 +174,7 @@ if (app) {
     input = 0;
     bindInputHandlers();
 
-    if (CONFIG.useServer) {
+    if (modeToUseServer(mode)) {
       world = null;
       void (async () => {
         connection = await connectLightDuel({
@@ -203,7 +204,10 @@ if (app) {
     });
   };
 
-  const menu = createMenu({ entry: 0.25, payout: 0.45 });
+  const menu = createMenu({ entry: 0.25, payout: 0.45, mode });
+  menu.onModeChange((nextMode) => {
+    mode = nextMode;
+  });
   menu.mount(app);
   menu.onStart(() => {
     menu.unmount();

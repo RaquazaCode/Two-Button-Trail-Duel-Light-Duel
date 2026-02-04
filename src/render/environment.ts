@@ -23,9 +23,9 @@ export const createEnvironment = (scene: THREE.Scene, renderer: THREE.WebGLRende
   });
   scene.add(floor);
 
-  const grid = new THREE.GridHelper(220, 24, 0x00f5ff, 0x0b2230);
+  const grid = new THREE.GridHelper(220, 24, 0x3af7ff, 0x1a4b5d);
   (grid.material as THREE.Material).transparent = true;
-  (grid.material as THREE.Material).opacity = 0.2;
+  (grid.material as THREE.Material).opacity = 0.35;
   grid.position.y = 0.02;
   scene.add(grid);
 
@@ -34,19 +34,25 @@ export const createEnvironment = (scene: THREE.Scene, renderer: THREE.WebGLRende
     count: 28,
     minHeight: 14,
     maxHeight: 36,
-    color: 0x0b1620,
-    emissive: 0x00f5ff,
+    color: 0x101e2a,
+    emissive: 0x3af7ff,
+  });
+  skyline.children.forEach((child) => {
+    const mesh = child as THREE.Mesh;
+    if (mesh.material && (mesh.material as THREE.MeshStandardMaterial).emissiveIntensity != null) {
+      (mesh.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.55;
+    }
   });
   scene.add(skyline);
 
   const stadium = new THREE.Mesh(
     new THREE.TorusGeometry(95, 2.5, 12, 48),
     new THREE.MeshStandardMaterial({
-      color: 0x07131d,
-      emissive: 0xff6a00,
-      emissiveIntensity: 0.35,
+      color: 0x1a0d08,
+      emissive: 0xff8a1f,
+      emissiveIntensity: 0.75,
       metalness: 0.4,
-      roughness: 0.5,
+      roughness: 0.45,
     })
   );
   stadium.rotation.x = Math.PI / 2;

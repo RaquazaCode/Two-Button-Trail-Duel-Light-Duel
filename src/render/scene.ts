@@ -11,7 +11,7 @@ export const createScene = (container: HTMLElement) => {
     0.1,
     500
   );
-  camera.position.set(0, 120, 80);
+  camera.position.set(0, 95, 110);
   camera.lookAt(0, 0, 0);
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -19,9 +19,9 @@ export const createScene = (container: HTMLElement) => {
   renderer.setSize(container.clientWidth, container.clientHeight);
   container.appendChild(renderer.domElement);
 
-  const ambient = new THREE.HemisphereLight(0x66ccff, 0x0b1016, 0.9);
-  const key = new THREE.DirectionalLight(0xb7e6ff, 0.85);
-  key.position.set(40, 80, 30);
+  const ambient = new THREE.HemisphereLight(0x9fe8ff, 0x10161c, 1.25);
+  const key = new THREE.DirectionalLight(0xcff4ff, 1.15);
+  key.position.set(40, 90, 40);
   scene.add(ambient, key);
 
   const environment = createEnvironment(scene, renderer);

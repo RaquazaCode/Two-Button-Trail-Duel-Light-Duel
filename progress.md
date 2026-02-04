@@ -17,3 +17,4 @@ TODO:
 - 2026-02-04: Phase 3 environment design doc added at docs/plans/2026-02-04-light-duel-phase-3-visual-design.md (cube-map reflective floor + skyline + fog).
 - 2026-02-04: Phase 3 env modules added (envGate, skyline, reflective floor, environment scene + main loop update). Playwright captures: /private/tmp/light-duel-web-game-phase3-env and /private/tmp/light-duel-web-game-phase3-play (scene currently too dark; needs lighting/fog tuning).
 - 2026-02-04: Brightness pass applied (brighter skyline emissive, stronger grid, warmer stadium ring, higher lights + adjusted camera). Playwright captures: /private/tmp/light-duel-web-game-phase3-bright.
+- 2026-02-04: Added spring-smoothed chase camera controller (over-the-shoulder). Playwright captures: /private/tmp/light-duel-web-game-chase.

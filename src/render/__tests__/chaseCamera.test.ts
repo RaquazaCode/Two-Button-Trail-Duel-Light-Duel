@@ -1,0 +1,34 @@
+import { computeChaseCamera } from "../chaseCamera";
+
+test("computeChaseCamera positions camera behind heading", () => {
+  const result = computeChaseCamera({
+    pos: { x: 0, y: 0 },
+    heading: 0,
+    height: 10,
+    distance: 20,
+    lookAhead: 12,
+    shoulder: 2,
+  });
+
+  expect(result.position.x).toBeCloseTo(-20);
+  expect(result.position.y).toBeCloseTo(10);
+  expect(result.position.z).toBeCloseTo(2);
+  expect(result.target.x).toBeCloseTo(12);
+  expect(result.target.z).toBeCloseTo(0);
+});
+
+test("computeChaseCamera respects heading rotation", () => {
+  const result = computeChaseCamera({
+    pos: { x: 5, y: 5 },
+    heading: Math.PI / 2,
+    height: 8,
+    distance: 10,
+    lookAhead: 6,
+    shoulder: 2,
+  });
+
+  expect(result.position.x).toBeCloseTo(3);
+  expect(result.position.z).toBeCloseTo(-5);
+  expect(result.target.x).toBeCloseTo(5);
+  expect(result.target.z).toBeCloseTo(11);
+});

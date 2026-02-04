@@ -7,6 +7,7 @@ import { createScene } from "./render/scene";
 import { createBloomComposer } from "./render/bloom";
 import { createBikeRenderer } from "./render/bike";
 import { createTrailRenderer } from "./render/trails";
+import { createChaseCameraController } from "./render/chaseCamera";
 import { createHUD } from "./ui/hud";
 import {
   createMenu,
@@ -63,6 +64,13 @@ if (app) {
   const bikeRenderer = createBikeRenderer(scene);
   const trailRenderer = createTrailRenderer(scene);
   const hud = createHUD();
+  const chaseCamera = createChaseCameraController(camera, {
+    height: 10,
+    distance: 18,
+    lookAhead: 14,
+    shoulder: 2,
+    smoothing: 6,
+  });
 
   const onResize = () => {
     resize();
@@ -84,6 +92,7 @@ if (app) {
     const now = performance.now();
     const dtMs = Math.max(1, now - lastFrame);
     lastFrame = now;
+    chaseCamera.update(next, dtMs / 1000);
     environment.update(dtMs);
     bikeRenderer.update(next.players);
     trailRenderer.update(next.trails);

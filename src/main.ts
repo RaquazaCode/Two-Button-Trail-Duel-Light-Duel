@@ -20,6 +20,8 @@ import {
 import { chooseBotInput } from "./sim/bot";
 import { renderGameToText } from "./game/telemetry";
 import { advanceWorld } from "./game/time";
+import { evaluateOutcome } from "./game/outcome";
+import { shouldAutoStart } from "./game/autostart";
 import { connectLightDuel, type LightDuelConnection } from "./net/colyseus";
 import { snapshotToWorld } from "./net/snapshot";
 
@@ -91,7 +93,7 @@ if (app) {
     lastFrame = now;
     chaseCamera.update(next, dtMs / 1000);
     environment.update(dtMs);
-    bikeRenderer.update(next.players);
+    bikeRenderer.update(next.players, next.time);
     trailRenderer.update(next.trails);
     hud.update({
       time: next.time,
@@ -162,24 +164,23 @@ if (app) {
   };
 
   const finishMatch = (next: WorldState) => {
-    const alive = next.players.filter((player) => player.alive);
-    const timeUp = next.time >= CONFIG.roundDuration;
-    if (!timeUp && alive.length > 1) return;
+    const outcome = evaluateOutcome(next, "p1", CONFIG.roundDuration);
+    if (!outcome.finished) return;
 
     loop?.stop();
     loop = null;
     void connection?.leave();
     connection = null;
 
-    const winner = alive[0]?.id ?? "none";
-    const hash = `${winner}-${Math.floor(next.time * 1000)}`;
-    const playerAlive = alive.some((player) => player.id === "p1");
-    const status = timeUp ? "TIME_UP" : playerAlive ? "VICTORY" : "ELIMINATED";
+    const hash = `${outcome.winner}-${Math.floor(next.time * 1000)}`;
     const result = createResult({
-      winner,
+      winner: outcome.winner,
       hash,
-      payout: winner === "p1" ? 0.45 : 0,
-      status,
+      payout: outcome.status === "VICTORY" ? 0.45 : 0,
+      status: outcome.status,
+      survival: outcome.survival,
+      eliminationReason: outcome.eliminationReason,
+      eliminatedBy: outcome.eliminatedBy,
     });
     result.mount(app);
     result.onRestart(() => {
@@ -260,4 +261,7 @@ if (app) {
   menu.onStart(() => {
     startMatch(menu);
   });
+  if (shouldAutoStart(window.location.search)) {
+    startMatch(menu);
+  }
 }

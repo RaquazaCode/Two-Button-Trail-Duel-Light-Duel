@@ -3,7 +3,7 @@ import type { TrailSegment } from "../sim/types";
 import { getPlayerColor } from "./palette";
 
 export const createTrailRenderer = (scene: THREE.Scene) => {
-  const segments = new Map<number, THREE.Mesh>();
+  const segments = new Map<string, THREE.Mesh>();
   const materials = new Map<number, THREE.MeshStandardMaterial>();
 
   const getMaterial = (color: number) => {
@@ -21,10 +21,12 @@ export const createTrailRenderer = (scene: THREE.Scene) => {
   };
 
   const addSegment = (seg: TrailSegment) => {
-    if (segments.has(seg.id)) return;
+    const key = `${seg.owner}-${seg.id}`;
+    if (segments.has(key)) return;
     const dx = seg.end.x - seg.start.x;
     const dz = seg.end.y - seg.start.y;
     const length = Math.hypot(dx, dz);
+    if (length > 8) return;
     if (length <= 0.0001) return;
 
     const geometry = new THREE.BoxGeometry(length, 0.12, 0.7);
@@ -36,7 +38,7 @@ export const createTrailRenderer = (scene: THREE.Scene) => {
     mesh.rotation.y = -Math.atan2(dz, dx);
 
     scene.add(mesh);
-    segments.set(seg.id, mesh);
+    segments.set(key, mesh);
   };
 
   const update = (trails: TrailSegment[]) => {

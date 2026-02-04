@@ -8,7 +8,8 @@ test("collision detects segment intersection", () => {
     [{ start: vec2(1, -1), end: vec2(1, 1), solidAt: 0, owner: "p2", id: 1 }],
     1
   );
-  expect(hit).toBe(true);
+  expect(hit.hit).toBe(true);
+  expect(hit.owner).toBe("p2");
 });
 
 test("bounds detect out of arena", () => {

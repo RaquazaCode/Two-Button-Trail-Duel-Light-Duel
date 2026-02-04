@@ -51,8 +51,13 @@ export const stepWorld = (
       trails.splice(0, trails.length, ...trailRes.trails);
     }
 
-    const hit =
-      outOfBounds(phys.pos, arenaHalf) || intersectsAny(p.pos, phys.pos, trails, time);
+    const trailHit = intersectsAny(p.pos, phys.pos, trails, time);
+    const wallHit = outOfBounds(phys.pos, arenaHalf);
+    const hit = wallHit
+      ? { reason: "WALL" as const }
+      : trailHit.hit
+        ? { reason: "TRAIL" as const, by: trailHit.owner }
+        : null;
 
     return resolveElimination({
       player: {

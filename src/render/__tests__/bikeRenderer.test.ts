@@ -16,9 +16,33 @@ test("bike renderer can reset and clear meshes", () => {
       gapOn: true,
       trailId: 0,
     },
-  ]);
+  ], 0);
 
   expect(scene.children.length).toBe(1);
   renderer.reset();
   expect(scene.children.length).toBe(0);
+});
+
+test("bike renderer fades eliminated players", () => {
+  const scene = new THREE.Scene();
+  const renderer = createBikeRenderer(scene);
+  renderer.update(
+    [
+      {
+        id: "p1",
+        pos: vec2(0, 0),
+        heading: 0,
+        turnVel: 0,
+        alive: false,
+        gapTimer: 0,
+        gapOn: true,
+        trailId: 0,
+        eliminatedAt: 0,
+      },
+    ],
+    0.25
+  );
+
+  const mesh = scene.children[0] as THREE.Group;
+  expect(mesh.visible).toBe(false);
 });

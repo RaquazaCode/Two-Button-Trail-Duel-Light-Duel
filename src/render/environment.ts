@@ -66,11 +66,11 @@ export const createEnvironment = (
   });
 
   const stadiumMaterial = new THREE.MeshStandardMaterial({
-    color: 0x2a1208,
-    emissive: 0xff4b1a,
-    emissiveIntensity: 1.05,
+    color: 0x3a1208,
+    emissive: 0xff3b1a,
+    emissiveIntensity: 1.4,
     metalness: 0.35,
-    roughness: 0.4,
+    roughness: 0.35,
   });
 
   const stadiumWall = new THREE.Mesh(

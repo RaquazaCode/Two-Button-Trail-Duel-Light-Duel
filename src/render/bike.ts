@@ -2,13 +2,13 @@ import * as THREE from "three";
 import type { PlayerState } from "../sim/types";
 import { getPlayerColor } from "./palette";
 
-const wheelGeometry = new THREE.TorusGeometry(0.95, 0.12, 16, 48);
-const wheelHubGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.5, 12);
-const bodyGeometry = new THREE.BoxGeometry(3.6, 0.6, 1.2);
-const noseGeometry = new THREE.BoxGeometry(1.2, 0.45, 0.9);
-const tailGeometry = new THREE.BoxGeometry(1.3, 0.55, 1.1);
-const canopyGeometry = new THREE.BoxGeometry(1.1, 0.4, 0.7);
-const stripGeometry = new THREE.BoxGeometry(2.6, 0.12, 0.14);
+const wheelGeometry = new THREE.TorusGeometry(1.45, 0.24, 20, 64);
+const wheelHubGeometry = new THREE.CylinderGeometry(0.32, 0.32, 0.75, 18);
+const bodyGeometry = new THREE.BoxGeometry(5.2, 0.9, 1.4);
+const noseGeometry = new THREE.BoxGeometry(1.6, 0.6, 1.0);
+const tailGeometry = new THREE.BoxGeometry(1.8, 0.7, 1.1);
+const canopyGeometry = new THREE.BoxGeometry(1.3, 0.5, 0.8);
+const stripGeometry = new THREE.BoxGeometry(4.4, 0.12, 0.16);
 
 export const createBikeModel = (color: number) => {
   const group = new THREE.Group();
@@ -36,53 +36,60 @@ export const createBikeModel = (color: number) => {
 
   const wheelFront = new THREE.Mesh(wheelGeometry, rimMaterial);
   wheelFront.rotation.z = Math.PI / 2;
-  wheelFront.position.set(1.75, 0.6, 0);
+  wheelFront.position.set(2.7, 0.85, 0);
   group.add(wheelFront);
 
   const wheelRear = new THREE.Mesh(wheelGeometry, rimMaterial);
   wheelRear.rotation.z = Math.PI / 2;
-  wheelRear.position.set(-1.75, 0.6, 0);
+  wheelRear.position.set(-2.7, 0.85, 0);
   group.add(wheelRear);
 
   const hubFront = new THREE.Mesh(wheelHubGeometry, bodyMaterial);
   hubFront.rotation.z = Math.PI / 2;
-  hubFront.position.set(1.75, 0.6, 0);
+  hubFront.position.set(2.7, 0.85, 0);
   group.add(hubFront);
 
   const hubRear = new THREE.Mesh(wheelHubGeometry, bodyMaterial);
   hubRear.rotation.z = Math.PI / 2;
-  hubRear.position.set(-1.75, 0.6, 0);
+  hubRear.position.set(-2.7, 0.85, 0);
   group.add(hubRear);
 
   const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
-  body.position.set(0, 0.55, 0);
+  body.position.set(0, 0.82, 0);
   group.add(body);
 
   const nose = new THREE.Mesh(noseGeometry, bodyMaterial);
-  nose.position.set(1.65, 0.58, 0);
+  nose.position.set(2.55, 0.8, 0);
   group.add(nose);
 
   const tail = new THREE.Mesh(tailGeometry, bodyMaterial);
-  tail.position.set(-1.65, 0.58, 0);
+  tail.position.set(-2.7, 0.82, 0);
   group.add(tail);
 
   const canopy = new THREE.Mesh(canopyGeometry, bodyMaterial);
-  canopy.position.set(0.3, 0.92, 0);
+  canopy.position.set(0.5, 1.18, 0);
   group.add(canopy);
 
   const strip = new THREE.Mesh(stripGeometry, accentMaterial);
-  strip.position.set(-0.1, 0.84, 0.45);
+  strip.position.set(-0.2, 1.08, 0.62);
   group.add(strip);
 
   const strip2 = new THREE.Mesh(stripGeometry, accentMaterial);
-  strip2.position.set(-0.1, 0.84, -0.45);
+  strip2.position.set(-0.2, 1.08, -0.62);
   group.add(strip2);
+
+  group.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    const material = child.material as THREE.MeshStandardMaterial;
+    child.userData.baseEmissive = material.emissiveIntensity ?? 0;
+  });
 
   return group;
 };
 
 export const createBikeRenderer = (scene: THREE.Scene) => {
   const bikes = new Map<string, THREE.Group>();
+  const fadeDuration = 0.2;
 
   const ensureBike = (player: PlayerState) => {
     if (bikes.has(player.id)) return bikes.get(player.id)!;
@@ -92,12 +99,24 @@ export const createBikeRenderer = (scene: THREE.Scene) => {
     return mesh;
   };
 
-  const update = (players: PlayerState[]) => {
+  const update = (players: PlayerState[], time: number) => {
     players.forEach((player) => {
       const mesh = ensureBike(player);
-      mesh.visible = player.alive;
+      const elapsed = player.eliminatedAt != null ? Math.max(0, time - player.eliminatedAt) : 0;
+      const fade = player.alive ? 0 : Math.min(1, elapsed / fadeDuration);
+      mesh.visible = player.alive || fade < 1;
       mesh.position.set(player.pos.x, 0.05, player.pos.y);
       mesh.rotation.y = -player.heading;
+
+      mesh.traverse((child) => {
+        if (!(child instanceof THREE.Mesh)) return;
+        const material = child.material as THREE.MeshStandardMaterial;
+        material.transparent = true;
+        const baseEmissive = (child.userData.baseEmissive as number) ?? material.emissiveIntensity ?? 0;
+        const alpha = player.alive ? 1 : 1 - fade;
+        material.opacity = alpha;
+        material.emissiveIntensity = baseEmissive * alpha;
+      });
     });
   };
 

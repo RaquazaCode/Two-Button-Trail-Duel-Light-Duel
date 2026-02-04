@@ -1,6 +1,7 @@
 import type { Vec2 } from "./math";
 
 export type PlayerId = string;
+export type EliminationReason = "TRAIL" | "WALL";
 
 export type PlayerState = {
   id: PlayerId;
@@ -12,6 +13,8 @@ export type PlayerState = {
   gapOn: boolean;
   trailId: number;
   eliminatedAt?: number;
+  eliminationReason?: EliminationReason;
+  eliminatedBy?: PlayerId;
 };
 
 export type TrailSegment = {

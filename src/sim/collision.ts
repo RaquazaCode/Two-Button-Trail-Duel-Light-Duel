@@ -21,7 +21,13 @@ export const intersectsAny = (
   trails: TrailSegment[],
   time: number
 ) => {
-  return trails.some((t) => time >= t.solidAt && segmentsIntersect(prev, next, t.start, t.end));
+  for (const trail of trails) {
+    if (time < trail.solidAt) continue;
+    if (segmentsIntersect(prev, next, trail.start, trail.end)) {
+      return { hit: true, owner: trail.owner };
+    }
+  }
+  return { hit: false };
 };
 
 export const outOfBounds = (pos: Vec2, arenaHalf: number) =>

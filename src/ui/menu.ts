@@ -15,13 +15,30 @@ export const formatResultTitle = (status: ResultStatus) => {
   return "Eliminated";
 };
 
-export const formatResultSubtitle = (args: {
+const formatCountdown = (seconds: number) => {
+  const clamped = Math.max(0, Math.floor(seconds));
+  const mins = Math.floor(clamped / 60);
+  const secs = clamped % 60;
+  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+};
+
+export const formatResultSubtitle = (args: { survival: number; payout: number }) =>
+  `Survived ${formatCountdown(args.survival)} • Payout ${args.payout.toFixed(2)}`;
+
+export const formatResultCause = (args: {
   status: ResultStatus;
   winner: string;
-  payout: number;
+  eliminatedBy?: string;
+  eliminationReason?: "TRAIL" | "WALL";
 }) => {
-  const winnerLabel = args.status === "VICTORY" ? "Winner: you" : `Winner: ${args.winner}`;
-  return `${winnerLabel} • Payout ${args.payout.toFixed(2)}`;
+  if (args.status === "VICTORY") return "You outlasted every rival.";
+  if (args.status === "TIME_UP") return `Time up. Winner: ${args.winner}`;
+  if (args.eliminationReason === "WALL") return "Crashed into the arena wall.";
+  if (args.eliminationReason === "TRAIL" && args.eliminatedBy) {
+    const label = args.eliminatedBy === "p1" ? "your trail" : `${args.eliminatedBy} (trail)`;
+    return `Eliminated by ${label}`;
+  }
+  return "Eliminated.";
 };
 
 export const coerceMode = (value: string): ModeOption =>
@@ -99,6 +116,9 @@ export const createResult = (args: {
   hash: string;
   payout: number;
   status: ResultStatus;
+  survival: number;
+  eliminationReason?: "TRAIL" | "WALL";
+  eliminatedBy?: string;
 }) => {
   const overlay = document.createElement("div");
   overlay.className = "menu";
@@ -106,10 +126,16 @@ export const createResult = (args: {
     <div class="menu-card">
       <h2>${formatResultTitle(args.status)}</h2>
       <p class="menu-sub">${formatResultSubtitle({
-        status: args.status,
-        winner: args.winner,
+        survival: args.survival,
         payout: args.payout,
       })}</p>
+      <p class="menu-sub">${formatResultCause({
+        status: args.status,
+        winner: args.winner,
+        eliminatedBy: args.eliminatedBy,
+        eliminationReason: args.eliminationReason,
+      })}</p>
+      <p class="menu-sub">Tap Play Again to start a fresh round.</p>
       <p class="menu-hash">Match hash: ${args.hash}</p>
       <button id="play-again">Play Again</button>
     </div>

@@ -30,6 +30,7 @@ body {
   position: absolute;
   top: 24px;
   left: 24px;
+  z-index: 3;
   padding: 16px 20px;
   border: 1px solid rgba(0, 255, 255, 0.2);
   border-radius: 12px;
@@ -56,6 +57,7 @@ body {
   place-items: center;
   background: rgba(5, 8, 13, 0.72);
   backdrop-filter: blur(4px);
+  z-index: 5;
 }
 
 .menu-card {

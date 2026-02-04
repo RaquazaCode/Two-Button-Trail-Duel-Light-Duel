@@ -13,9 +13,11 @@ test("player marked eliminated on collision", () => {
       gapOn: true,
       trailId: 0,
     },
-    hit: true,
+    hit: { reason: "TRAIL", by: "b2" },
     time: 10,
   });
   expect(res.alive).toBe(false);
   expect(res.eliminatedAt).toBe(10);
+  expect(res.eliminationReason).toBe("TRAIL");
+  expect(res.eliminatedBy).toBe("b2");
 });

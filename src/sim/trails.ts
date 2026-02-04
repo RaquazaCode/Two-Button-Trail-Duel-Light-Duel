@@ -20,6 +20,13 @@ export const updateTrail = (args: {
     return { trails: args.trails, gapOnState, gapTimer: args.time };
   }
 
+  const dx = args.next.x - args.prev.x;
+  const dz = args.next.y - args.prev.y;
+  const length = Math.hypot(dx, dz);
+  if (length > 8) {
+    return { trails: args.trails, gapOnState, gapTimer: args.time };
+  }
+
   const seg: TrailSegment = {
     id: args.state.trailId + 1,
     owner: args.owner,

@@ -9,7 +9,7 @@ test("createBikeModel builds a long, aerodynamic bike silhouette", () => {
   const size = new THREE.Vector3();
   bounds.getSize(size);
 
-  expect(size.x).toBeGreaterThan(size.z * 1.4);
+  expect(size.x).toBeGreaterThan(size.z * 2.2);
   expect(size.y).toBeLessThan(size.x);
 
   const wheelMeshes = bike.children.filter((child) => {

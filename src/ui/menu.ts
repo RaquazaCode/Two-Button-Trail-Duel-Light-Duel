@@ -2,14 +2,22 @@ export type MenuState = {
   entry: number;
   payout: number;
   mode: ModeOption;
+  status: ConnectionStatus;
 };
 
 export type ModeOption = "LOCAL" | "ONLINE";
+export type ConnectionStatus = "DISCONNECTED" | "CONNECTING" | "CONNECTED";
 
 export const coerceMode = (value: string): ModeOption =>
   value === "ONLINE" ? "ONLINE" : "LOCAL";
 
 export const modeToUseServer = (mode: ModeOption) => mode === "ONLINE";
+
+export const formatConnectionStatus = (status: ConnectionStatus) => {
+  if (status === "CONNECTING") return "Connecting";
+  if (status === "CONNECTED") return "Connected";
+  return "Disconnected";
+};
 
 export const createMenu = (args: MenuState) => {
   const overlay = document.createElement("div");
@@ -36,6 +44,7 @@ export const createMenu = (args: MenuState) => {
           ${modeButton("ONLINE")}
         </div>
       </div>
+      <p class="menu-status" id="menu-status">${formatConnectionStatus(args.status)}</p>
       <button id="start-btn">Start Match</button>
     </div>
   `;
@@ -60,7 +69,13 @@ export const createMenu = (args: MenuState) => {
     });
   };
 
-  return { mount, unmount, onStart, onModeChange };
+  const setStatus = (status: ConnectionStatus) => {
+    const node = overlay.querySelector<HTMLParagraphElement>("#menu-status");
+    if (!node) return;
+    node.textContent = formatConnectionStatus(status);
+  };
+
+  return { mount, unmount, onStart, onModeChange, setStatus };
 };
 
 export const createResult = (args: { winner: string; hash: string; payout: number }) => {

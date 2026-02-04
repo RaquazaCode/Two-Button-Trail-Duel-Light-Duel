@@ -8,7 +8,13 @@ import { createBloomComposer } from "./render/bloom";
 import { createBikeRenderer } from "./render/bike";
 import { createTrailRenderer } from "./render/trails";
 import { createHUD } from "./ui/hud";
-import { createMenu, createResult, modeToUseServer, type ModeOption } from "./ui/menu";
+import {
+  createMenu,
+  createResult,
+  modeToUseServer,
+  type ConnectionStatus,
+  type ModeOption,
+} from "./ui/menu";
 import { chooseBotInput } from "./sim/bot";
 import { renderGameToText } from "./game/telemetry";
 import { advanceWorld } from "./game/time";
@@ -71,6 +77,7 @@ if (app) {
   let input: -1 | 0 | 1 = 0;
   let connection: LightDuelConnection | null = null;
   let mode: ModeOption = CONFIG.useServer ? "ONLINE" : "LOCAL";
+  let connectionStatus: ConnectionStatus = "DISCONNECTED";
 
   const applyWorld = (next: WorldState) => {
     bikeRenderer.update(next.players);
@@ -165,7 +172,7 @@ if (app) {
     });
   };
 
-  const startMatch = () => {
+  const startMatch = (menu: ReturnType<typeof createMenu>) => {
     loop?.stop();
     loop = null;
     void connection?.leave();
@@ -176,18 +183,38 @@ if (app) {
 
     if (modeToUseServer(mode)) {
       world = null;
+      connectionStatus = "CONNECTING";
+      menu.setStatus(connectionStatus);
       void (async () => {
-        connection = await connectLightDuel({
-          url: CONFIG.serverUrl,
-          onSnapshot: (snapshot) => {
-            world = snapshotToWorld(snapshot);
-            applyWorld(world);
-            finishMatch(world);
-          },
-        });
+        try {
+          connection = await connectLightDuel({
+            url: CONFIG.serverUrl,
+            onSnapshot: (snapshot) => {
+              if (connectionStatus !== "CONNECTED") {
+                connectionStatus = "CONNECTED";
+                menu.setStatus(connectionStatus);
+                menu.unmount();
+              }
+              world = snapshotToWorld(snapshot);
+              applyWorld(world);
+              finishMatch(world);
+            },
+            onLeave: () => {
+              connectionStatus = "DISCONNECTED";
+              menu.setStatus(connectionStatus);
+            },
+          });
+        } catch (err) {
+          connectionStatus = "DISCONNECTED";
+          menu.setStatus(connectionStatus);
+        }
       })();
       return;
     }
+
+    connectionStatus = "DISCONNECTED";
+    menu.setStatus(connectionStatus);
+    menu.unmount();
 
     world = {
       time: 0,
@@ -204,13 +231,14 @@ if (app) {
     });
   };
 
-  const menu = createMenu({ entry: 0.25, payout: 0.45, mode });
+  const menu = createMenu({ entry: 0.25, payout: 0.45, mode, status: connectionStatus });
   menu.onModeChange((nextMode) => {
     mode = nextMode;
+    connectionStatus = "DISCONNECTED";
+    menu.setStatus(connectionStatus);
   });
   menu.mount(app);
   menu.onStart(() => {
-    menu.unmount();
-    startMatch();
+    startMatch(menu);
   });
 }

@@ -27,3 +27,4 @@ TODO:
 - 2026-02-04: Set trails to continuous (gapOff=0), split long segments in sim to avoid flashes, and use trailWidth for render geometry. Arena size 10x (2500) and bike speed increased (24).
 - 2026-02-04: Performance pass: clamp renderer pixel ratio, reuse trail geometry, cap skyline counts, and add camera far scaling. Reduced billboard glare and bloom intensity; moved stadium material to config.
 - 2026-02-04: Autostart Playwright captures in output/web-game-visual-pass-autostart-3 and output/web-game-visual-pass-autostart-4 (gameplay shots).
+- 2026-02-04: Reduced arena size to 3.5x (arenaSize 875), added self-trail grace window to prevent immediate elimination, and randomized spawn positions/headings with minimum spacing. Playwright captures: output/web-game-visual-pass-autostart-5 (shots 0-2).

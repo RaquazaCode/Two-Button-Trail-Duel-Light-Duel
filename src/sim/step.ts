@@ -51,7 +51,10 @@ export const stepWorld = (
       trails.splice(0, trails.length, ...trailRes.trails);
     }
 
-    const trailHit = intersectsAny(p.pos, phys.pos, trails, time);
+    const trailHit = intersectsAny(p.pos, phys.pos, trails, time, {
+      selfId: p.id,
+      selfGrace: CONFIG.selfTrailGrace,
+    });
     const wallHit = outOfBounds(phys.pos, arenaHalf);
     const hit = wallHit
       ? { reason: "WALL" as const }

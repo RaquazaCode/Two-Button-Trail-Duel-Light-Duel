@@ -1,5 +1,5 @@
 export const CONFIG = {
-  arenaSize: 2500,
+  arenaSize: 875,
   speed: 24,
   turnRate: 2.2,
   turnInertia: 0.2,
@@ -7,6 +7,7 @@ export const CONFIG = {
   solidifyDelay: 0.2,
   gapOn: 2.0,
   gapOff: 0,
+  selfTrailGrace: 0.35,
   shrinkStart: 50,
   shrinkEnd: 150,
   shrinkTo: 0.45,

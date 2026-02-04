@@ -19,10 +19,15 @@ export const intersectsAny = (
   prev: Vec2,
   next: Vec2,
   trails: TrailSegment[],
-  time: number
+  time: number,
+  options?: { selfId?: string; selfGrace?: number }
 ) => {
   for (const trail of trails) {
     if (time < trail.solidAt) continue;
+    if (options?.selfId && trail.owner === options.selfId) {
+      const grace = options.selfGrace ?? 0;
+      if (time - trail.createdAt < grace) continue;
+    }
     if (segmentsIntersect(prev, next, trail.start, trail.end)) {
       return { hit: true, owner: trail.owner };
     }

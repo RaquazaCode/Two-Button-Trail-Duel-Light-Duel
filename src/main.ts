@@ -24,27 +24,29 @@ import { evaluateOutcome } from "./game/outcome";
 import { shouldAutoStart } from "./game/autostart";
 import { connectLightDuel, type LightDuelConnection } from "./net/colyseus";
 import { snapshotToWorld } from "./net/snapshot";
+import { generateSpawnPoints } from "./game/spawn";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
 const createPlayers = (): PlayerState[] => {
-  const players: PlayerState[] = [];
-  const radius = CONFIG.arenaSize * 0.3;
   const total = 8;
-  for (let i = 0; i < total; i += 1) {
-    const angle = (Math.PI * 2 * i) / total;
-    players.push({
-      id: i === 0 ? "p1" : `b${i}`,
-      pos: vec2(Math.cos(angle) * radius, Math.sin(angle) * radius),
-      heading: angle + Math.PI,
-      turnVel: 0,
-      alive: true,
-      gapTimer: 0,
-      gapOn: true,
-      trailId: 0,
-    });
-  }
-  return players;
+  const spawns = generateSpawnPoints({
+    count: total,
+    arenaHalf: CONFIG.arenaSize / 2,
+    minDistance: CONFIG.speed * 5,
+    margin: CONFIG.speed * 2,
+  });
+
+  return spawns.map((spawn, index) => ({
+    id: index === 0 ? "p1" : `b${index}`,
+    pos: vec2(spawn.pos.x, spawn.pos.y),
+    heading: spawn.heading,
+    turnVel: 0,
+    alive: true,
+    gapTimer: 0,
+    gapOn: true,
+    trailId: 0,
+  }));
 };
 
 if (app) {

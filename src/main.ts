@@ -1,4 +1,8 @@
 import "./style.css";
+import { CONFIG } from "./sim/config";
+import { vec2 } from "./sim/math";
+import type { WorldState } from "./sim/types";
+import { createGameLoop } from "./game/loop";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -6,7 +10,54 @@ if (app) {
   app.innerHTML = `
     <div class="boot">
       <h1>Light Duel</h1>
-      <p>Bootstrapping Vite + Three.js...</p>
+      <p id="status">Initializing...</p>
     </div>
   `;
+
+  const status = document.querySelector<HTMLParagraphElement>("#status");
+
+  const world: WorldState = {
+    time: 0,
+    players: [
+      {
+        id: "p1",
+        pos: vec2(0, 0),
+        heading: 0,
+        turnVel: 0,
+        alive: true,
+        gapTimer: 0,
+        gapOn: true,
+        trailId: 0,
+      },
+    ],
+    trails: [],
+    arenaHalf: CONFIG.arenaSize / 2,
+    running: true,
+  };
+
+  let input: -1 | 0 | 1 = 0;
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") input = -1;
+    if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") input = 1;
+  });
+
+  window.addEventListener("keyup", (event) => {
+    if (
+      event.key === "ArrowLeft" ||
+      event.key.toLowerCase() === "a" ||
+      event.key === "ArrowRight" ||
+      event.key.toLowerCase() === "d"
+    ) {
+      input = 0;
+    }
+  });
+
+  createGameLoop(world, () => ({ p1: input }), (next) => {
+    if (status) {
+      status.textContent = `t=${next.time.toFixed(2)}s pos=(${next.players[0].pos.x.toFixed(
+        1
+      )}, ${next.players[0].pos.y.toFixed(1)})`;
+    }
+  });
 }

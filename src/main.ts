@@ -10,6 +10,8 @@ import { createTrailRenderer } from "./render/trails";
 import { createHUD } from "./ui/hud";
 import { createMenu, createResult } from "./ui/menu";
 import { chooseBotInput } from "./sim/bot";
+import { renderGameToText } from "./game/telemetry";
+import { advanceWorld } from "./game/time";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -64,6 +66,48 @@ if (app) {
 
   let loop: LoopHandle | null = null;
   let world: WorldState | null = null;
+  let input: -1 | 0 | 1 = 0;
+
+  const applyWorld = (next: WorldState) => {
+    bikeRenderer.update(next.players);
+    trailRenderer.update(next.trails);
+    hud.update({
+      time: next.time,
+      alive: next.players.filter((p) => p.alive).length,
+      total: next.players.length,
+    });
+    composer.render();
+  };
+
+  const getInputs = () => {
+    if (!world) return { p1: 0 };
+    const inputs: Record<string, -1 | 0 | 1> = { p1: input };
+    world.players
+      .filter((p) => p.id !== "p1")
+      .forEach((bot) => {
+        inputs[bot.id] = chooseBotInput({
+          pos: bot.pos,
+          heading: bot.heading,
+          arenaHalf: world!.arenaHalf,
+          trails: world!.trails,
+        });
+      });
+    return inputs;
+  };
+
+  window.render_game_to_text = () => {
+    if (!world) {
+      return JSON.stringify({ mode: "menu", players: [], trails: { count: 0 } });
+    }
+    return renderGameToText(world);
+  };
+
+  window.advanceTime = (ms: number) => {
+    if (!world) return;
+    loop?.stop();
+    world = advanceWorld(world, getInputs(), ms, 1 / CONFIG.simHz);
+    applyWorld(world);
+  };
 
   const startMatch = () => {
     world = {
@@ -74,7 +118,7 @@ if (app) {
       running: true,
     };
 
-    let input: -1 | 0 | 1 = 0;
+    input = 0;
 
     window.onkeydown = (event) => {
       if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") input = -1;
@@ -92,52 +136,27 @@ if (app) {
       }
     };
 
-    loop = createGameLoop(
-      world,
-      () => {
-        if (!world) return { p1: 0 };
-        const inputs: Record<string, -1 | 0 | 1> = { p1: input };
-        world.players
-          .filter((p) => p.id !== "p1")
-          .forEach((bot) => {
-            inputs[bot.id] = chooseBotInput({
-              pos: bot.pos,
-              heading: bot.heading,
-              arenaHalf: world!.arenaHalf,
-              trails: world!.trails,
-            });
-          });
-        return inputs;
-      },
-      (next) => {
-        world = next;
-        bikeRenderer.update(next.players);
-        trailRenderer.update(next.trails);
-        hud.update({
-          time: next.time,
-          alive: next.players.filter((p) => p.alive).length,
-          total: next.players.length,
-        });
-        composer.render();
+    loop = createGameLoop(world, getInputs, (next) => {
+      world = next;
+      applyWorld(next);
 
-        const alive = next.players.filter((p) => p.alive);
-        if (alive.length <= 1) {
-          loop?.stop();
-          const winner = alive[0]?.id ?? "none";
-          const hash = `${winner}-${Math.floor(next.time * 1000)}`;
-          const result = createResult({
-            winner,
-            hash,
-            payout: winner === "p1" ? 0.45 : 0,
-          });
-          result.mount(app);
-          result.onRestart(() => {
-            result.unmount();
-            startMatch();
-          });
-        }
+      const alive = next.players.filter((p) => p.alive);
+      if (alive.length <= 1) {
+        loop?.stop();
+        const winner = alive[0]?.id ?? "none";
+        const hash = `${winner}-${Math.floor(next.time * 1000)}`;
+        const result = createResult({
+          winner,
+          hash,
+          payout: winner === "p1" ? 0.45 : 0,
+        });
+        result.mount(app);
+        result.onRestart(() => {
+          result.unmount();
+          startMatch();
+        });
       }
-    );
+    });
   };
 
   const menu = createMenu({ entry: 0.25, payout: 0.45 });

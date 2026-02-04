@@ -5,6 +5,8 @@ import type { WorldState } from "./sim/types";
 import { createGameLoop } from "./game/loop";
 import { createScene } from "./render/scene";
 import { createBloomComposer } from "./render/bloom";
+import { createBikeRenderer } from "./render/bike";
+import { createTrailRenderer } from "./render/trails";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -26,6 +28,8 @@ if (app) {
 
   const { scene, camera, renderer, resize } = createScene(stage);
   const { composer, resize: resizeBloom } = createBloomComposer(renderer, scene, camera);
+  const bikeRenderer = createBikeRenderer(scene);
+  const trailRenderer = createTrailRenderer(scene);
 
   const onResize = () => {
     resize();
@@ -73,11 +77,15 @@ if (app) {
   });
 
   createGameLoop(world, () => ({ p1: input }), (next) => {
+    bikeRenderer.update(next.players);
+    trailRenderer.update(next.trails);
+
     if (status) {
       status.textContent = `t=${next.time.toFixed(2)}s pos=(${next.players[0].pos.x.toFixed(
         1
       )}, ${next.players[0].pos.y.toFixed(1)})`;
     }
+
     composer.render();
   });
 }

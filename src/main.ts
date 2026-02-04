@@ -7,6 +7,7 @@ import { createScene } from "./render/scene";
 import { createBloomComposer } from "./render/bloom";
 import { createBikeRenderer } from "./render/bike";
 import { createTrailRenderer } from "./render/trails";
+import { createHUD } from "./ui/hud";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -20,7 +21,6 @@ if (app) {
   `;
 
   const stage = document.querySelector<HTMLDivElement>("#stage");
-  const status = document.querySelector<HTMLParagraphElement>("#status");
 
   if (!stage) {
     throw new Error("Stage container not found");
@@ -30,6 +30,7 @@ if (app) {
   const { composer, resize: resizeBloom } = createBloomComposer(renderer, scene, camera);
   const bikeRenderer = createBikeRenderer(scene);
   const trailRenderer = createTrailRenderer(scene);
+  const hud = createHUD();
 
   const onResize = () => {
     resize();
@@ -79,13 +80,11 @@ if (app) {
   createGameLoop(world, () => ({ p1: input }), (next) => {
     bikeRenderer.update(next.players);
     trailRenderer.update(next.trails);
-
-    if (status) {
-      status.textContent = `t=${next.time.toFixed(2)}s pos=(${next.players[0].pos.x.toFixed(
-        1
-      )}, ${next.players[0].pos.y.toFixed(1)})`;
-    }
-
+    hud.update({
+      time: next.time,
+      alive: next.players.filter((p) => p.alive).length,
+      total: next.players.length,
+    });
     composer.render();
   });
 }

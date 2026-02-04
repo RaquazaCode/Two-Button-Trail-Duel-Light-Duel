@@ -58,7 +58,7 @@ if (app) {
     throw new Error("Stage container not found");
   }
 
-  const { scene, camera, renderer, resize } = createScene(stage);
+  const { scene, camera, renderer, resize, environment } = createScene(stage);
   const { composer, resize: resizeBloom } = createBloomComposer(renderer, scene, camera);
   const bikeRenderer = createBikeRenderer(scene);
   const trailRenderer = createTrailRenderer(scene);
@@ -78,8 +78,13 @@ if (app) {
   let connection: LightDuelConnection | null = null;
   let mode: ModeOption = CONFIG.useServer ? "ONLINE" : "LOCAL";
   let connectionStatus: ConnectionStatus = "DISCONNECTED";
+  let lastFrame = performance.now();
 
   const applyWorld = (next: WorldState) => {
+    const now = performance.now();
+    const dtMs = Math.max(1, now - lastFrame);
+    lastFrame = now;
+    environment.update(dtMs);
     bikeRenderer.update(next.players);
     trailRenderer.update(next.trails);
     hud.update({
@@ -177,6 +182,7 @@ if (app) {
     loop = null;
     void connection?.leave();
     connection = null;
+    lastFrame = performance.now();
 
     input = 0;
     bindInputHandlers();

@@ -11,3 +11,4 @@ TODO:
 - 2026-02-04: Playwright install blocked (registry ENOTFOUND). Pending local install to run web-game test loop.
 - 2026-02-04: Added Colyseus server scaffolding + LightDuelRoom sim loop with input/snapshot helpers and tests.
 - 2026-02-04: Added client net adapter (snapshot mapping, input message mapping) plus ServerSnapshot type and config toggle.
+- 2026-02-04: HUD now shows mode (LOCAL/ONLINE) with formatStatus helper + test. Playwright run captured screenshots in /private/tmp/light-duel-web-game-mode.

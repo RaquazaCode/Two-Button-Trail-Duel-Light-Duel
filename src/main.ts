@@ -78,6 +78,7 @@ if (app) {
       time: next.time,
       alive: next.players.filter((p) => p.alive).length,
       total: next.players.length,
+      mode: CONFIG.useServer ? "ONLINE" : "LOCAL",
     });
     composer.render();
   };

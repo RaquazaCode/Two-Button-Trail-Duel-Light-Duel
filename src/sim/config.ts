@@ -11,4 +11,6 @@ export const CONFIG = {
   shrinkEnd: 60,
   shrinkTo: 0.4,
   simHz: 60,
+  useServer: false,
+  serverUrl: "ws://localhost:2567",
 };

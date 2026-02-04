@@ -30,3 +30,17 @@ export type WorldState = {
   arenaHalf: number;
   running: boolean;
 };
+
+export type ServerSnapshot = {
+  tick: number;
+  time: number;
+  arenaHalf: number;
+  players: Array<{
+    id: PlayerId;
+    pos: Vec2;
+    heading: number;
+    alive: boolean;
+    eliminatedAt?: number;
+  }>;
+  trails: TrailSegment[];
+};

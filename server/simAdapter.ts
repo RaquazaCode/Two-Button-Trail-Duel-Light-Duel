@@ -1,20 +1,6 @@
 import { CONFIG } from "../src/sim/config";
 import { vec2 } from "../src/sim/math";
-import type { PlayerState, TrailSegment, WorldState } from "../src/sim/types";
-
-export type ServerSnapshot = {
-  tick: number;
-  time: number;
-  arenaHalf: number;
-  players: Array<{
-    id: string;
-    pos: PlayerState["pos"];
-    heading: number;
-    alive: boolean;
-    eliminatedAt?: number;
-  }>;
-  trails: TrailSegment[];
-};
+import type { PlayerState, ServerSnapshot, WorldState } from "../src/sim/types";
 
 export const createWorld = (playerIds: string[], now = 0): WorldState => {
   const arenaHalf = CONFIG.arenaSize / 2;

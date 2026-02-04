@@ -4,9 +4,10 @@ Original prompt: Implement the Light Duel plan (Vite + Three.js) and continue in
 - 2026-02-04: Added .gitignore entries for .DS_Store and node_modules; committed dependency lockfile.
 
 TODO:
-- Add render_game_to_text + advanceTime hooks for automated game testing.
 - Run Playwright-based game test loop once dev server is running.
-- Begin Phase 2 server scaffolding (Colyseus) and client net adapter.
+- Start Colyseus server and exercise online mode with CONFIG.useServer.
 
 - 2026-02-04: Added render_game_to_text and advanceTime helpers with tests; wired into main.
 - 2026-02-04: Playwright install blocked (registry ENOTFOUND). Pending local install to run web-game test loop.
+- 2026-02-04: Added Colyseus server scaffolding + LightDuelRoom sim loop with input/snapshot helpers and tests.
+- 2026-02-04: Added client net adapter (snapshot mapping, input message mapping) plus ServerSnapshot type and config toggle.

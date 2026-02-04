@@ -12,6 +12,8 @@ import { createMenu, createResult } from "./ui/menu";
 import { chooseBotInput } from "./sim/bot";
 import { renderGameToText } from "./game/telemetry";
 import { advanceWorld } from "./game/time";
+import { connectLightDuel, type LightDuelConnection } from "./net/colyseus";
+import { snapshotToWorld } from "./net/snapshot";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -67,6 +69,7 @@ if (app) {
   let loop: LoopHandle | null = null;
   let world: WorldState | null = null;
   let input: -1 | 0 | 1 = 0;
+  let connection: LightDuelConnection | null = null;
 
   const applyWorld = (next: WorldState) => {
     bikeRenderer.update(next.players);
@@ -103,26 +106,26 @@ if (app) {
   };
 
   window.advanceTime = (ms: number) => {
+    if (CONFIG.useServer) return;
     if (!world) return;
     loop?.stop();
     world = advanceWorld(world, getInputs(), ms, 1 / CONFIG.simHz);
     applyWorld(world);
   };
 
-  const startMatch = () => {
-    world = {
-      time: 0,
-      players: createPlayers(),
-      trails: [],
-      arenaHalf: CONFIG.arenaSize / 2,
-      running: true,
-    };
+  const setInput = (value: -1 | 0 | 1) => {
+    input = value;
+    connection?.sendInput(value);
+  };
 
-    input = 0;
-
+  const bindInputHandlers = () => {
     window.onkeydown = (event) => {
-      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") input = -1;
-      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") input = 1;
+      if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
+        setInput(-1);
+      }
+      if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
+        setInput(1);
+      }
     };
 
     window.onkeyup = (event) => {
@@ -132,30 +135,70 @@ if (app) {
         event.key === "ArrowRight" ||
         event.key.toLowerCase() === "d"
       ) {
-        input = 0;
+        setInput(0);
       }
+    };
+  };
+
+  const finishMatch = (next: WorldState) => {
+    const alive = next.players.filter((player) => player.alive);
+    if (alive.length > 1) return;
+
+    loop?.stop();
+    loop = null;
+    void connection?.leave();
+    connection = null;
+
+    const winner = alive[0]?.id ?? "none";
+    const hash = `${winner}-${Math.floor(next.time * 1000)}`;
+    const result = createResult({
+      winner,
+      hash,
+      payout: winner === "p1" ? 0.45 : 0,
+    });
+    result.mount(app);
+    result.onRestart(() => {
+      result.unmount();
+      startMatch();
+    });
+  };
+
+  const startMatch = () => {
+    loop?.stop();
+    loop = null;
+    void connection?.leave();
+    connection = null;
+
+    input = 0;
+    bindInputHandlers();
+
+    if (CONFIG.useServer) {
+      world = null;
+      void (async () => {
+        connection = await connectLightDuel({
+          url: CONFIG.serverUrl,
+          onSnapshot: (snapshot) => {
+            world = snapshotToWorld(snapshot);
+            applyWorld(world);
+            finishMatch(world);
+          },
+        });
+      })();
+      return;
+    }
+
+    world = {
+      time: 0,
+      players: createPlayers(),
+      trails: [],
+      arenaHalf: CONFIG.arenaSize / 2,
+      running: true,
     };
 
     loop = createGameLoop(world, getInputs, (next) => {
       world = next;
       applyWorld(next);
-
-      const alive = next.players.filter((p) => p.alive);
-      if (alive.length <= 1) {
-        loop?.stop();
-        const winner = alive[0]?.id ?? "none";
-        const hash = `${winner}-${Math.floor(next.time * 1000)}`;
-        const result = createResult({
-          winner,
-          hash,
-          payout: winner === "p1" ? 0.45 : 0,
-        });
-        result.mount(app);
-        result.onRestart(() => {
-          result.unmount();
-          startMatch();
-        });
-      }
+      finishMatch(next);
     });
   };
 

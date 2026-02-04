@@ -8,6 +8,7 @@ import { createBloomComposer } from "./render/bloom";
 import { createBikeRenderer } from "./render/bike";
 import { createTrailRenderer } from "./render/trails";
 import { createChaseCameraController } from "./render/chaseCamera";
+import { CHASE_CONFIG } from "./render/chaseConfig";
 import { createHUD } from "./ui/hud";
 import {
   createMenu,
@@ -66,16 +67,7 @@ if (app) {
   const bikeRenderer = createBikeRenderer(scene);
   const trailRenderer = createTrailRenderer(scene);
   const hud = createHUD();
-  const chaseCamera = createChaseCameraController(camera, {
-    height: 6,
-    distance: 16,
-    lookAhead: 26,
-    shoulder: 2.2,
-    smoothing: 7,
-    rollFactor: 0.35,
-    rollMax: 0.25,
-    rollSmoothing: 10,
-  });
+  const chaseCamera = createChaseCameraController(camera, CHASE_CONFIG);
 
   const onResize = () => {
     resize();

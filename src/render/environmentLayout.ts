@@ -7,6 +7,8 @@ export type EnvironmentLayout = {
   gridMajorLine: number;
   floorSize: number;
   stadiumRadius: number;
+  stadiumTube: number;
+  stadiumHeight: number;
   skylineRadius: number;
   skylineCount: number;
 };
@@ -25,6 +27,8 @@ export const computeEnvironmentLayout = (arenaSize: number): EnvironmentLayout =
     gridMajorLine: 0.2,
     floorSize: arenaSize * 6,
     stadiumRadius: arenaHalf * 1.02,
+    stadiumTube: 4,
+    stadiumHeight: 8,
     skylineRadius: arenaHalf * 3.2,
     skylineCount: Math.max(24, Math.round(arenaSize / 8)),
   };

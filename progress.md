@@ -19,3 +19,4 @@ TODO:
 - 2026-02-04: Brightness pass applied (brighter skyline emissive, stronger grid, warmer stadium ring, higher lights + adjusted camera). Playwright captures: /private/tmp/light-duel-web-game-phase3-bright.
 - 2026-02-04: Added spring-smoothed chase camera controller (over-the-shoulder). Playwright captures: /private/tmp/light-duel-web-game-chase.
 - 2026-02-04: Updated sim tuning to Balanced preset (arena 250, speed 16, shrink 50–150s), added shader-based grid overlay + environment layout scaling, and added camera roll + narrower FOV. Playwright captures: output/web-game/shot-0.png to shot-2.png.
+- 2026-02-04: Added aerodynamic bike model, skyline building accents, thicker/brighter danger ring, and gentler camera roll. Playwright captures: output/web-game-bike-skyline/shot-0.png to shot-2.png.

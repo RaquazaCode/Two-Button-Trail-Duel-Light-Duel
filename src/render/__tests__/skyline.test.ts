@@ -18,7 +18,18 @@ test("createSkyline builds a ring of buildings", () => {
     const distance = Math.hypot(child.position.x, child.position.z);
     expect(distance).toBeGreaterThan(110);
     expect(distance).toBeLessThan(170);
-    expect(child.scale.y).toBeGreaterThanOrEqual(12);
-    expect(child.scale.y).toBeLessThanOrEqual(28);
+
+    const bounds = new THREE.Box3().setFromObject(child);
+    const size = new THREE.Vector3();
+    bounds.getSize(size);
+    expect(size.y).toBeGreaterThanOrEqual(12);
+    expect(size.y).toBeLessThanOrEqual(28);
+
+    const emissiveCount = child.children.filter((mesh) => {
+      if (!(mesh instanceof THREE.Mesh)) return false;
+      const material = mesh.material as THREE.MeshStandardMaterial;
+      return material.emissiveIntensity != null && material.emissiveIntensity > 0.5;
+    });
+    expect(emissiveCount.length).toBeGreaterThan(0);
   });
 });

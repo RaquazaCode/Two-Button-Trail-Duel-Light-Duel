@@ -59,18 +59,34 @@ export const createEnvironment = (
   });
   scene.add(skyline);
 
-  const stadium = new THREE.Mesh(
-    new THREE.TorusGeometry(layout.stadiumRadius, 3, 16, 64),
-    new THREE.MeshStandardMaterial({
-      color: 0x1a0d08,
-      emissive: 0xff8a1f,
-      emissiveIntensity: 0.85,
-      metalness: 0.4,
-      roughness: 0.45,
-    })
+  const stadiumMaterial = new THREE.MeshStandardMaterial({
+    color: 0x2a1208,
+    emissive: 0xff4b1a,
+    emissiveIntensity: 1.05,
+    metalness: 0.35,
+    roughness: 0.4,
+  });
+
+  const stadiumWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(
+      layout.stadiumRadius + layout.stadiumTube * 0.35,
+      layout.stadiumRadius + layout.stadiumTube * 0.35,
+      layout.stadiumHeight,
+      64,
+      1,
+      true
+    ),
+    stadiumMaterial
   );
-  stadium.rotation.x = Math.PI / 2;
-  scene.add(stadium);
+  stadiumWall.position.y = layout.stadiumHeight * 0.5 - 0.2;
+  scene.add(stadiumWall);
+
+  const stadiumRim = new THREE.Mesh(
+    new THREE.TorusGeometry(layout.stadiumRadius, layout.stadiumTube, 16, 64),
+    stadiumMaterial
+  );
+  stadiumRim.rotation.x = Math.PI / 2;
+  scene.add(stadiumRim);
 
   const gate = createEnvUpdateGate({ stride: 5, maxFrameMs: 40, sampleSize: 5 });
 

@@ -10,6 +10,8 @@ const tailGeometry = new THREE.BoxGeometry(1.8, 0.7, 1.1);
 const canopyGeometry = new THREE.BoxGeometry(1.3, 0.5, 0.8);
 const stripGeometry = new THREE.BoxGeometry(4.4, 0.12, 0.16);
 
+export const BIKE_HEIGHT = 2.4;
+
 export const createBikeModel = (color: number) => {
   const group = new THREE.Group();
   const bodyMaterial = new THREE.MeshStandardMaterial({

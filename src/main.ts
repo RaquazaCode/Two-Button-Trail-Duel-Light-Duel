@@ -88,6 +88,7 @@ if (app) {
   let mode: ModeOption = CONFIG.useServer ? "ONLINE" : "LOCAL";
   let connectionStatus: ConnectionStatus = "DISCONNECTED";
   let lastFrame = performance.now();
+  let menu: ReturnType<typeof createMenu>;
 
   const applyWorld = (next: WorldState) => {
     const now = performance.now();
@@ -189,9 +190,15 @@ if (app) {
       result.unmount();
       startMatch();
     });
+    result.onMainMenu(() => {
+      result.unmount();
+      connectionStatus = "DISCONNECTED";
+      menu.setStatus(connectionStatus);
+      menu.mount(app);
+    });
   };
 
-  const startMatch = (menu: ReturnType<typeof createMenu>) => {
+  const startMatch = () => {
     loop?.stop();
     loop = null;
     void connection?.leave();
@@ -253,7 +260,7 @@ if (app) {
     });
   };
 
-  const menu = createMenu({ entry: 0.25, payout: 0.45, mode, status: connectionStatus });
+  menu = createMenu({ entry: 0.25, payout: 0.45, mode, status: connectionStatus });
   menu.onModeChange((nextMode) => {
     mode = nextMode;
     connectionStatus = "DISCONNECTED";
@@ -261,9 +268,9 @@ if (app) {
   });
   menu.mount(app);
   menu.onStart(() => {
-    startMatch(menu);
+    startMatch();
   });
   if (shouldAutoStart(window.location.search)) {
-    startMatch(menu);
+    startMatch();
   }
 }

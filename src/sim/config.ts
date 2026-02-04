@@ -1,6 +1,6 @@
 export const CONFIG = {
   arenaSize: 875,
-  speed: 24,
+  speed: 48,
   turnRate: 2.2,
   turnInertia: 0.2,
   trailWidth: 0.6,

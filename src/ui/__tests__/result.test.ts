@@ -1,4 +1,5 @@
 import {
+  getResultActions,
   formatResultCause,
   formatResultSubtitle,
   formatResultTitle,
@@ -28,4 +29,9 @@ test("formatResultCause explains elimination cause", () => {
     eliminationReason: "TRAIL",
   });
   expect(text).toBe("Eliminated by b2 (trail)");
+});
+
+test("getResultActions includes play again and main menu", () => {
+  const actions = getResultActions();
+  expect(actions).toEqual(["Play Again", "Main Menu"]);
 });

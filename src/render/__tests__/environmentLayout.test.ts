@@ -4,9 +4,9 @@ test("computeEnvironmentLayout scales arena visuals", () => {
   const layout = computeEnvironmentLayout(250);
 
   expect(layout.arenaHalf).toBe(125);
-  expect(layout.gridSize).toBeCloseTo(255);
-  expect(layout.floorSize).toBeCloseTo(1500);
-  expect(layout.stadiumRadius).toBeCloseTo(127.5);
+  expect(layout.gridSize).toBeCloseTo(250);
+  expect(layout.floorSize).toBeCloseTo(250);
+  expect(layout.stadiumRadius).toBeCloseTo(125);
   expect(layout.stadiumTube).toBeCloseTo(6);
   expect(layout.stadiumHeight).toBeCloseTo(12);
   expect(layout.skylineLayers.length).toBe(3);

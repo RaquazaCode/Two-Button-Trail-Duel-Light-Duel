@@ -36,4 +36,4 @@ export const intersectsAny = (
 };
 
 export const outOfBounds = (pos: Vec2, arenaHalf: number) =>
-  Math.abs(pos.x) > arenaHalf || Math.abs(pos.y) > arenaHalf;
+  Math.hypot(pos.x, pos.y) > arenaHalf;

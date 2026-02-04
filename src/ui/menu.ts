@@ -41,6 +41,8 @@ export const formatResultCause = (args: {
   return "Eliminated.";
 };
 
+export const getResultActions = () => ["Play Again", "Main Menu"] as const;
+
 export const coerceMode = (value: string): ModeOption =>
   value === "ONLINE" ? "ONLINE" : "LOCAL";
 
@@ -121,6 +123,7 @@ export const createResult = (args: {
   eliminatedBy?: string;
 }) => {
   const overlay = document.createElement("div");
+  const [playLabel, menuLabel] = getResultActions();
   overlay.className = "menu";
   overlay.innerHTML = `
     <div class="menu-card">
@@ -137,7 +140,8 @@ export const createResult = (args: {
       })}</p>
       <p class="menu-sub">Tap Play Again to start a fresh round.</p>
       <p class="menu-hash">Match hash: ${args.hash}</p>
-      <button id="play-again">Play Again</button>
+      <button id="play-again">${playLabel}</button>
+      <button id="main-menu">${menuLabel}</button>
     </div>
   `;
 
@@ -149,5 +153,10 @@ export const createResult = (args: {
     if (btn) btn.onclick = handler;
   };
 
-  return { mount, unmount, onRestart };
+  const onMainMenu = (handler: () => void) => {
+    const btn = overlay.querySelector<HTMLButtonElement>("#main-menu");
+    if (btn) btn.onclick = handler;
+  };
+
+  return { mount, unmount, onRestart, onMainMenu };
 };

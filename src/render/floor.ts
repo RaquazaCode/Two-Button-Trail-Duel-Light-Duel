@@ -9,7 +9,7 @@ type FloorArgs = {
 };
 
 export const createReflectiveFloor = (args: FloorArgs) => {
-  const geometry = new THREE.PlaneGeometry(args.size, args.size);
+  const geometry = new THREE.CircleGeometry(args.size / 2, 180);
   const material = new THREE.MeshStandardMaterial({
     color: args.color,
     metalness: 1,

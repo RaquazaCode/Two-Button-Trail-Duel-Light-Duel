@@ -152,3 +152,7 @@ body {
 .menu button:hover {
   background: rgba(0, 245, 255, 0.2);
 }
+
+.menu button + button {
+  margin-top: 10px;
+}

@@ -2,11 +2,12 @@ import * as THREE from "three";
 import type { TrailSegment } from "../sim/types";
 import { getPlayerColor } from "./palette";
 import { CONFIG } from "../sim/config";
+import { BIKE_HEIGHT } from "./bike";
 
 export const createTrailRenderer = (scene: THREE.Scene) => {
   const segments = new Map<string, THREE.Mesh>();
   const materials = new Map<number, THREE.MeshStandardMaterial>();
-  const height = Math.max(0.08, CONFIG.trailWidth * 0.2);
+  const height = BIKE_HEIGHT * 0.7;
   const baseGeometry = new THREE.BoxGeometry(1, height, CONFIG.trailWidth);
 
   const getMaterial = (color: number) => {
@@ -36,7 +37,7 @@ export const createTrailRenderer = (scene: THREE.Scene) => {
     const midX = (seg.start.x + seg.end.x) / 2;
     const midZ = (seg.start.y + seg.end.y) / 2;
 
-    mesh.position.set(midX, 0.05, midZ);
+    mesh.position.set(midX, height * 0.5 + 0.02, midZ);
     mesh.rotation.y = -Math.atan2(dz, dx);
     mesh.scale.set(length, 1, 1);
 

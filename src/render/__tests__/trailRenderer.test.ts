@@ -3,6 +3,7 @@ import { vec2 } from "../../sim/math";
 import { createTrailRenderer } from "../trails";
 import { getPlayerColor } from "../palette";
 import { CONFIG } from "../../sim/config";
+import { BIKE_HEIGHT } from "../bike";
 
 test("trail renderer colors segments per player and can reset", () => {
   const scene = new THREE.Scene();
@@ -71,5 +72,5 @@ test("trail renderer uses configured width and height", () => {
   const geometry = mesh.geometry as THREE.BoxGeometry;
   expect(mesh.scale.x).toBeCloseTo(2);
   expect(geometry.parameters.depth).toBeCloseTo(CONFIG.trailWidth);
-  expect(geometry.parameters.height).toBeCloseTo(CONFIG.trailWidth * 0.2);
+  expect(geometry.parameters.height).toBeCloseTo(BIKE_HEIGHT * 0.7);
 });

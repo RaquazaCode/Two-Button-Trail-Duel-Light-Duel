@@ -28,3 +28,4 @@ TODO:
 - 2026-02-04: Performance pass: clamp renderer pixel ratio, reuse trail geometry, cap skyline counts, and add camera far scaling. Reduced billboard glare and bloom intensity; moved stadium material to config.
 - 2026-02-04: Autostart Playwright captures in output/web-game-visual-pass-autostart-3 and output/web-game-visual-pass-autostart-4 (gameplay shots).
 - 2026-02-04: Reduced arena size to 3.5x (arenaSize 875), added self-trail grace window to prevent immediate elimination, and randomized spawn positions/headings with minimum spacing. Playwright captures: output/web-game-visual-pass-autostart-5 (shots 0-2).
+- 2026-02-04: Doubled bike speed (48), switched collision to circular arena boundary, rendered circular floor/grid clipped to ring, added 3D ribbon trails (70% bike height), and added result overlay Main Menu button. Playwright captures: output/web-game-visual-pass-autostart-6 (shots 0-2).

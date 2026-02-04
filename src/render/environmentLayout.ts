@@ -28,13 +28,13 @@ export const computeEnvironmentLayout = (arenaSize: number): EnvironmentLayout =
 
   return {
     arenaHalf,
-    gridSize: arenaSize * 1.02,
+    gridSize: arenaSize,
     gridCell,
     gridMajorEvery,
     gridMinorLine: 0.08,
     gridMajorLine: 0.2,
-    floorSize: arenaSize * 6,
-    stadiumRadius: arenaHalf * 1.02,
+    floorSize: arenaSize,
+    stadiumRadius: arenaHalf,
     stadiumTube: 6,
     stadiumHeight: 12,
     skylineLayers: [

@@ -44,4 +44,6 @@ test("self trail ignored within grace window", () => {
 
 test("bounds detect out of arena", () => {
   expect(outOfBounds(vec2(6, 0), 5)).toBe(true);
+  expect(outOfBounds(vec2(3, 4), 5)).toBe(false);
+  expect(outOfBounds(vec2(5, 5), 5)).toBe(true);
 });

@@ -12,7 +12,7 @@ type GridArgs = {
 };
 
 export const createGridOverlay = (args: GridArgs) => {
-  const geometry = new THREE.PlaneGeometry(args.size, args.size, 1, 1);
+  const geometry = new THREE.CircleGeometry(args.size / 2, 160);
   const material = new THREE.ShaderMaterial({
     transparent: true,
     blending: THREE.AdditiveBlending,

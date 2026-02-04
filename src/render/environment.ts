@@ -4,7 +4,7 @@ import { createReflectiveFloor } from "./floor";
 import { createSkyline } from "./skyline";
 
 export const createEnvironment = (scene: THREE.Scene, renderer: THREE.WebGLRenderer) => {
-  scene.fog = new THREE.FogExp2(0x05080d, 0.018);
+  scene.fog = new THREE.FogExp2(0x05080d, 0.01);
 
   const envTarget = new THREE.WebGLCubeRenderTarget(512, {
     format: THREE.RGBAFormat,
@@ -18,8 +18,8 @@ export const createEnvironment = (scene: THREE.Scene, renderer: THREE.WebGLRende
     size: 260,
     envMap: envTarget.texture,
     roughness: 0.08,
-    envMapIntensity: 1.1,
-    color: 0x050b12,
+    envMapIntensity: 1.6,
+    color: 0x0a121c,
   });
   scene.add(floor);
 

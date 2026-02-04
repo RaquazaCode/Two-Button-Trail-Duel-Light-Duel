@@ -19,8 +19,8 @@ export const createScene = (container: HTMLElement) => {
   renderer.setSize(container.clientWidth, container.clientHeight);
   container.appendChild(renderer.domElement);
 
-  const ambient = new THREE.HemisphereLight(0x66ccff, 0x070b12, 0.65);
-  const key = new THREE.DirectionalLight(0xb7e6ff, 0.5);
+  const ambient = new THREE.HemisphereLight(0x66ccff, 0x0b1016, 0.9);
+  const key = new THREE.DirectionalLight(0xb7e6ff, 0.85);
   key.position.set(40, 80, 30);
   scene.add(ambient, key);
 

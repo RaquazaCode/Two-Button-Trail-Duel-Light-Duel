@@ -1,8 +1,13 @@
 :root {
   color-scheme: dark;
-  font-family: "Orbitron", system-ui, sans-serif;
+  --font-display: "Orbitron", system-ui, sans-serif;
+  --font-ui: "Rajdhani", system-ui, sans-serif;
+  --ui-primary: #d9f7ff;
+  --ui-secondary: #9be7ff;
+  --ui-accent: #00e5ff;
+  font-family: var(--font-ui);
   background: #0b0e13;
-  color: #e9f2ff;
+  color: var(--ui-primary);
 }
 
 * {
@@ -33,23 +38,26 @@ body {
   transform: translateX(-50%);
   z-index: 3;
   padding: 18px 28px;
-  border: 1px solid rgba(0, 255, 255, 0.3);
+  border: 1px solid rgba(0, 229, 255, 0.35);
   border-radius: 14px;
   background: rgba(6, 12, 18, 0.8);
-  box-shadow: 0 0 28px rgba(0, 255, 255, 0.25);
+  box-shadow: 0 0 28px rgba(0, 229, 255, 0.3);
   text-align: center;
 }
 
 .hud h1 {
   margin: 0 0 6px;
   letter-spacing: 0.08em;
-  font-size: 20px;
+  font-family: var(--font-display);
+  font-size: clamp(20px, 3vh, 32px);
+  text-shadow: 0 0 6px var(--ui-accent), 0 0 18px var(--ui-accent);
 }
 
 .hud p {
   margin: 0;
-  color: rgba(233, 242, 255, 0.8);
-  font-size: 14px;
+  color: var(--ui-primary);
+  font-size: clamp(16px, 2.4vh, 28px);
+  text-shadow: 0 0 6px var(--ui-accent), 0 0 18px var(--ui-accent);
 }
 
 .menu {
@@ -66,29 +74,38 @@ body {
   width: min(440px, 92vw);
   padding: 32px 34px;
   border-radius: 18px;
-  border: 1px solid rgba(0, 255, 255, 0.25);
+  border: 1px solid rgba(0, 229, 255, 0.25);
   background: rgba(8, 16, 24, 0.92);
-  box-shadow: 0 0 36px rgba(0, 255, 255, 0.28);
+  box-shadow: 0 0 36px rgba(0, 229, 255, 0.28);
   text-align: center;
 }
 
 .menu-card h2 {
   margin: 0 0 8px;
   letter-spacing: 0.08em;
-  font-size: 24px;
+  font-family: var(--font-display);
+  font-size: clamp(40px, 6vh, 72px);
+  color: var(--ui-primary);
+  text-shadow: 0 0 6px var(--ui-accent), 0 0 18px var(--ui-accent);
+}
+
+.result-title {
+  font-family: var(--font-ui);
+  letter-spacing: 0.04em;
 }
 
 .menu-sub {
   margin: 0 0 20px;
-  color: rgba(233, 242, 255, 0.72);
-  font-size: 15px;
+  color: var(--ui-secondary);
+  font-size: clamp(20px, 3vh, 40px);
+  text-shadow: 0 0 6px var(--ui-accent), 0 0 18px var(--ui-accent);
 }
 
 .menu-row {
   display: flex;
   justify-content: space-between;
   margin: 8px 0;
-  font-size: 16px;
+  font-size: clamp(18px, 2.8vh, 32px);
 }
 
 .menu-row.menu-mode {
@@ -98,8 +115,8 @@ body {
 
 .menu-status {
   margin: 6px 0 0;
-  font-size: 13px;
-  color: rgba(233, 242, 255, 0.6);
+  font-size: clamp(16px, 2.5vh, 28px);
+  color: var(--ui-secondary);
   letter-spacing: 0.04em;
 }
 
@@ -117,27 +134,27 @@ body {
   border-radius: 999px;
   border: 1px solid transparent;
   background: transparent;
-  color: rgba(233, 242, 255, 0.7);
-  font-size: 12px;
+  color: var(--ui-secondary);
+  font-size: clamp(12px, 1.8vh, 20px);
   letter-spacing: 0.08em;
   cursor: pointer;
 }
 
 .mode-button.active {
-  border-color: rgba(0, 255, 255, 0.55);
-  background: rgba(0, 245, 255, 0.12);
-  color: #e9f2ff;
-  box-shadow: 0 0 12px rgba(0, 255, 255, 0.25);
+  border-color: rgba(0, 229, 255, 0.55);
+  background: rgba(0, 229, 255, 0.14);
+  color: var(--ui-primary);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
 }
 
 .menu-row strong {
-  color: #00f5ff;
+  color: var(--ui-accent);
 }
 
 .menu-hash {
   margin: 12px 0 18px;
-  font-size: 12px;
-  color: rgba(233, 242, 255, 0.6);
+  font-size: clamp(14px, 2vh, 22px);
+  color: var(--ui-secondary);
   word-break: break-all;
 }
 
@@ -145,12 +162,13 @@ body {
   margin-top: 16px;
   padding: 12px 18px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 255, 255, 0.4);
-  background: rgba(0, 245, 255, 0.1);
-  color: #e9f2ff;
+  border: 1px solid rgba(0, 229, 255, 0.5);
+  background: rgba(0, 229, 255, 0.12);
+  color: var(--ui-primary);
   font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
+  font-size: clamp(16px, 2.4vh, 28px);
+  text-shadow: 0 0 6px var(--ui-accent), 0 0 18px var(--ui-accent);
 }
 
 .menu button:hover {
@@ -171,19 +189,19 @@ body {
 .difficulty-button {
   padding: 10px 16px;
   border-radius: 999px;
-  border: 1px solid rgba(0, 255, 255, 0.25);
+  border: 1px solid rgba(0, 229, 255, 0.35);
   background: rgba(8, 18, 26, 0.9);
-  color: rgba(233, 242, 255, 0.7);
-  font-size: 13px;
+  color: var(--ui-secondary);
+  font-size: clamp(14px, 2vh, 22px);
   letter-spacing: 0.08em;
   cursor: pointer;
 }
 
 .difficulty-button.active {
-  border-color: rgba(0, 255, 255, 0.55);
-  background: rgba(0, 245, 255, 0.12);
-  color: #e9f2ff;
-  box-shadow: 0 0 12px rgba(0, 255, 255, 0.25);
+  border-color: rgba(0, 229, 255, 0.55);
+  background: rgba(0, 229, 255, 0.14);
+  color: var(--ui-primary);
+  box-shadow: 0 0 12px rgba(0, 229, 255, 0.3);
 }
 
 .difficulty-desc {

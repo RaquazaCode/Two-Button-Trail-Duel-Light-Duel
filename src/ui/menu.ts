@@ -195,7 +195,7 @@ export const createResult = (args: {
   overlay.className = "menu";
   overlay.innerHTML = `
     <div class="menu-card">
-      <h2>${formatResultTitle(args.status)}</h2>
+      <h2 class="result-title">${formatResultTitle(args.status)}</h2>
       <p class="menu-sub">${formatResultSubtitle({
         survival: args.survival,
         payout: args.payout,

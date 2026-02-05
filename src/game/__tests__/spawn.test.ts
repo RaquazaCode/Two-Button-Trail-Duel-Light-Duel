@@ -39,3 +39,26 @@ test("generateSpawnPoints spreads players within bounds", () => {
     }
   }
 });
+
+test("generateSpawnPoints always fills requested slots", () => {
+  const rng = makeRng(7);
+  const spawns = generateSpawnPoints({
+    count: 8,
+    arenaHalf: 200,
+    minDistance: 60,
+    margin: 20,
+    rng,
+    maxAttempts: 0,
+  });
+
+  expect(spawns).toHaveLength(8);
+
+  for (let i = 0; i < spawns.length; i += 1) {
+    for (let j = i + 1; j < spawns.length; j += 1) {
+      const dx = spawns[i].pos.x - spawns[j].pos.x;
+      const dy = spawns[i].pos.y - spawns[j].pos.y;
+      const distance = Math.hypot(dx, dy);
+      expect(distance).toBeGreaterThanOrEqual(60);
+    }
+  }
+});

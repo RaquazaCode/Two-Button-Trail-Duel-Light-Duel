@@ -3,8 +3,8 @@ import { vec2 } from "../math";
 
 const trails: any[] = [];
 
-test("hard difficulty prefers aggressive cut-off vs easy", () => {
-  const easyInput = chooseBotInput({
+test("roamer vs hunter prefer different targets", () => {
+  const roamerInput = chooseBotInput({
     id: "b1",
     pos: vec2(0, 0),
     heading: 0,
@@ -12,12 +12,14 @@ test("hard difficulty prefers aggressive cut-off vs easy", () => {
     arenaHalf: 100,
     trails,
     time: 0,
-    playerPos: vec2(20, 8),
+    playerPos: vec2(20, 0),
     difficulty: "EASY",
+    role: "ROAMER",
+    goalAngle: Math.PI,
     rng: () => 0.1,
   });
 
-  const hardInput = chooseBotInput({
+  const hunterInput = chooseBotInput({
     id: "b1",
     pos: vec2(0, 0),
     heading: 0,
@@ -25,11 +27,12 @@ test("hard difficulty prefers aggressive cut-off vs easy", () => {
     arenaHalf: 100,
     trails,
     time: 0,
-    playerPos: vec2(20, 8),
-    difficulty: "HARD",
+    playerPos: vec2(20, 0),
+    difficulty: "EASY",
+    role: "HUNTER",
+    goalAngle: Math.PI,
     rng: () => 0.1,
   });
 
-  expect(easyInput).toBe(0);
-  expect(hardInput).not.toBe(0);
+  expect(roamerInput).not.toBe(hunterInput);
 });

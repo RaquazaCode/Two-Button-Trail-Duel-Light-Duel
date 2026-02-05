@@ -1,13 +1,13 @@
 export const PLAYER_COLOR = 0x00f5ff;
 
 const BOT_COLORS = [
-  0xff3b30,
-  0xff9500,
-  0xffd60a,
-  0x34c759,
-  0x30d5c8,
-  0xaf52de,
-  0xff2d55,
+  0xff2dfb,
+  0x39ff14,
+  0xff7a00,
+  0xffe600,
+  0x9b00ff,
+  0xff003c,
+  0x007bff,
 ];
 
 const extractIndex = (id: string) => {

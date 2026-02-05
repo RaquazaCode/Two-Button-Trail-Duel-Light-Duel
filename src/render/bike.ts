@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import type { PlayerState } from "../sim/types";
 import { getPlayerColor } from "./palette";
+import { getFlashIntensity } from "./elimination";
 
 const wheelGeometry = new THREE.TorusGeometry(1.45, 0.24, 20, 64);
 const wheelHubGeometry = new THREE.CylinderGeometry(0.32, 0.32, 0.75, 18);
@@ -84,6 +85,7 @@ export const createBikeModel = (color: number) => {
     if (!(child instanceof THREE.Mesh)) return;
     const material = child.material as THREE.MeshStandardMaterial;
     child.userData.baseEmissive = material.emissiveIntensity ?? 0;
+    child.userData.baseEmissiveColor = material.emissive.clone();
   });
 
   return group;
@@ -106,6 +108,7 @@ export const createBikeRenderer = (scene: THREE.Scene) => {
       const mesh = ensureBike(player);
       const elapsed = player.eliminatedAt != null ? Math.max(0, time - player.eliminatedAt) : 0;
       const fade = player.alive ? 0 : Math.min(1, elapsed / fadeDuration);
+      const flash = player.alive ? 0 : getFlashIntensity(elapsed);
       mesh.visible = player.alive || fade < 1;
       mesh.position.set(player.pos.x, 0.05, player.pos.y);
       mesh.rotation.y = -player.heading;
@@ -117,7 +120,11 @@ export const createBikeRenderer = (scene: THREE.Scene) => {
         const baseEmissive = (child.userData.baseEmissive as number) ?? material.emissiveIntensity ?? 0;
         const alpha = player.alive ? 1 : 1 - fade;
         material.opacity = alpha;
-        material.emissiveIntensity = baseEmissive * alpha;
+        const baseColor = child.userData.baseEmissiveColor as THREE.Color | undefined;
+        if (baseColor) {
+          material.emissive.copy(baseColor).lerp(new THREE.Color(0xffffff), flash);
+        }
+        material.emissiveIntensity = (baseEmissive * alpha) + flash * 2.5;
       });
     });
   };

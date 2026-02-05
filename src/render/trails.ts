@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { TrailSegment } from "../sim/types";
+import type { PlayerState, TrailSegment } from "../sim/types";
 import { getPlayerColor } from "./palette";
 import { CONFIG } from "../sim/config";
 import { BIKE_HEIGHT } from "./bike";
@@ -7,8 +7,10 @@ import { BIKE_HEIGHT } from "./bike";
 export const createTrailRenderer = (scene: THREE.Scene) => {
   const segments = new Map<string, THREE.Mesh>();
   const materials = new Map<number, THREE.MeshStandardMaterial>();
+  const ownerMaterials = new Map<string, THREE.MeshStandardMaterial>();
   const height = BIKE_HEIGHT * 0.7;
   const baseGeometry = new THREE.BoxGeometry(1, height, CONFIG.trailWidth);
+  const baseEmissive = 1.35;
 
   const getMaterial = (color: number) => {
     const existing = materials.get(color);
@@ -16,10 +18,15 @@ export const createTrailRenderer = (scene: THREE.Scene) => {
     const material = new THREE.MeshStandardMaterial({
       color,
       emissive: color,
-      emissiveIntensity: 1.35,
+      emissiveIntensity: baseEmissive,
       metalness: 0.1,
       roughness: 0.2,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
     });
+    material.toneMapped = false;
+    material.userData.baseEmissive = baseEmissive;
     materials.set(color, material);
     return material;
   };
@@ -47,7 +54,9 @@ export const createTrailRenderer = (scene: THREE.Scene) => {
       const key = `${seg.owner}-${seg.id}-${i}`;
       if (segments.has(key)) continue;
 
-      const mesh = new THREE.Mesh(baseGeometry, getMaterial(getPlayerColor(seg.owner)));
+      const material = getMaterial(getPlayerColor(seg.owner));
+      ownerMaterials.set(seg.owner, material);
+      const mesh = new THREE.Mesh(baseGeometry, material);
       const midX = (startX + endX) / 2;
       const midZ = (startZ + endZ) / 2;
 
@@ -60,13 +69,34 @@ export const createTrailRenderer = (scene: THREE.Scene) => {
     }
   };
 
-  const update = (trails: TrailSegment[]) => {
+  const applyTrailPulse = (players?: PlayerState[], time = 0) => {
+    if (!players) return;
+    players.forEach((player) => {
+      const material = ownerMaterials.get(player.id);
+      if (!material) return;
+      const base = (material.userData.baseEmissive as number) ?? baseEmissive;
+      if (player.eliminatedAt == null) {
+        material.emissiveIntensity = base;
+        return;
+      }
+      const elapsed = Math.max(0, time - player.eliminatedAt);
+      if (elapsed < 0.15) {
+        material.emissiveIntensity = base * 2.5;
+        return;
+      }
+      material.emissiveIntensity = base * 0.85;
+    });
+  };
+
+  const update = (trails: TrailSegment[], players?: PlayerState[], time?: number) => {
     trails.forEach(addSegment);
+    applyTrailPulse(players, time ?? 0);
   };
 
   const reset = () => {
     segments.forEach((mesh) => scene.remove(mesh));
     segments.clear();
+    ownerMaterials.clear();
   };
 
   return { update, reset };

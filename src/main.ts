@@ -11,6 +11,7 @@ import { createChaseCameraController } from "./render/chaseCamera";
 import { CHASE_CONFIG } from "./render/chaseConfig";
 import { createHUD } from "./ui/hud";
 import { createMinimap } from "./ui/minimap";
+import { createEliminationEffects } from "./render/elimination";
 import {
   createMenu,
   createResult,
@@ -21,6 +22,7 @@ import {
   type ModeOption,
 } from "./ui/menu";
 import { chooseBotInput } from "./sim/bot";
+import { assignBotRoles, type BotRole } from "./sim/botRoles";
 import { renderGameToText } from "./game/telemetry";
 import { advanceWorld } from "./game/time";
 import { evaluateOutcome } from "./game/outcome";
@@ -73,6 +75,7 @@ if (app) {
   const { composer, resize: resizeBloom } = createBloomComposer(renderer, scene, camera);
   const bikeRenderer = createBikeRenderer(scene);
   const trailRenderer = createTrailRenderer(scene);
+  const eliminationEffects = createEliminationEffects(scene);
   const hud = createHUD();
   const minimap = createMinimap(app);
   const chaseCamera = createChaseCameraController(camera, CHASE_CONFIG);
@@ -91,6 +94,7 @@ if (app) {
   let connection: LightDuelConnection | null = null;
   let mode: ModeOption = CONFIG.useServer ? "ONLINE" : "LOCAL";
   let difficulty: DifficultyOption = "EASY";
+  let botRoles = new Map<string, BotRole>();
   let connectionStatus: ConnectionStatus = "DISCONNECTED";
   let lastFrame = performance.now();
   let menu: ReturnType<typeof createMenu>;
@@ -103,7 +107,8 @@ if (app) {
     chaseCamera.update(next, dtMs / 1000);
     environment.update(dtMs);
     bikeRenderer.update(next.players, next.time);
-    trailRenderer.update(next.trails);
+    trailRenderer.update(next.trails, next.players, next.time);
+    eliminationEffects.update(next.players, next.time);
     hud.update({
       time: next.time,
       alive: next.players.filter((p) => p.alive).length,
@@ -132,6 +137,7 @@ if (app) {
           time: world!.time,
           playerPos: player?.pos,
           difficulty,
+          role: botRoles.get(bot.id),
         });
       });
     return inputs;
@@ -221,6 +227,7 @@ if (app) {
     lastFrame = performance.now();
     trailRenderer.reset();
     bikeRenderer.reset();
+    eliminationEffects.reset();
 
     input = 0;
     bindInputHandlers();
@@ -267,6 +274,10 @@ if (app) {
       arenaHalf: CONFIG.arenaSize / 2,
       running: true,
     };
+    botRoles = assignBotRoles(
+      world.players.filter((player) => player.id !== "p1").map((player) => player.id),
+      difficulty
+    );
 
     loop = createGameLoop(world, getInputs, (next) => {
       world = next;

@@ -30,3 +30,7 @@ TODO:
 - 2026-02-04: Reduced arena size to 3.5x (arenaSize 875), added self-trail grace window to prevent immediate elimination, and randomized spawn positions/headings with minimum spacing. Playwright captures: output/web-game-visual-pass-autostart-5 (shots 0-2).
 - 2026-02-04: Doubled bike speed (48), switched collision to circular arena boundary, rendered circular floor/grid clipped to ring, added 3D ribbon trails (70% bike height), and added result overlay Main Menu button. Playwright captures: output/web-game-visual-pass-autostart-6 (shots 0-2).
 - 2026-02-04: Added stacked stadium band with gradient (base + top + rim), boosted skyline heights/strips with low-glare billboards, softened fog for deeper skyline, tightened turn radius, and upgraded bots to predictive steering. Playwright captures: output/web-game-visual-pass-autostart-7 (shots 0-2).
+- 2026-02-04: Added near-ring skyline layer (1.8x), raised skyline heights, made stadium band fully vertical (no gap), and optimized bot lookahead with spatial filtering for smoother performance. Playwright captures: output/web-game-visual-pass-autostart-8 (shots 0-2).
+- 2026-02-05: Rebuilt skyline as InstancedMesh silhouettes (single geometry/material) with procedural emissive striping and raised base heights; reduced skyline counts for performance.
+- 2026-02-05: Replaced realtime cube reflections with a static env map for the floor.
+- 2026-02-05: Trail renderer now splits long segments to prevent invisible collisions.

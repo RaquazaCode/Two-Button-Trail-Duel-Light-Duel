@@ -10,5 +10,5 @@ test("config uses balanced tuning preset", () => {
   expect(CONFIG.shrinkStart).toBe(50);
   expect(CONFIG.shrinkEnd).toBe(150);
   expect(CONFIG.shrinkTo).toBe(0.45);
-  expect(CONFIG.roundDuration).toBe(90);
+  expect(CONFIG.roundDuration).toBe(100);
 });

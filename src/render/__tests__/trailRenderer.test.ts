@@ -37,7 +37,7 @@ test("trail renderer colors segments per player and can reset", () => {
   expect(scene.children.length).toBe(0);
 });
 
-test("trail renderer skips abnormal long segments", () => {
+test("trail renderer splits long segments into visible pieces", () => {
   const scene = new THREE.Scene();
   const renderer = createTrailRenderer(scene);
   renderer.update([
@@ -51,7 +51,11 @@ test("trail renderer skips abnormal long segments", () => {
     },
   ]);
 
-  expect(scene.children.length).toBe(0);
+  const meshes = scene.children.filter((child) => child instanceof THREE.Mesh) as THREE.Mesh[];
+  expect(meshes.length).toBeGreaterThan(0);
+  meshes.forEach((mesh) => {
+    expect(mesh.scale.x).toBeLessThanOrEqual(8);
+  });
 });
 
 test("trail renderer uses configured width and height", () => {

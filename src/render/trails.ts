@@ -25,24 +25,39 @@ export const createTrailRenderer = (scene: THREE.Scene) => {
   };
 
   const addSegment = (seg: TrailSegment) => {
-    const key = `${seg.owner}-${seg.id}`;
-    if (segments.has(key)) return;
     const dx = seg.end.x - seg.start.x;
     const dz = seg.end.y - seg.start.y;
     const length = Math.hypot(dx, dz);
-    if (length > 8) return;
     if (length <= 0.0001) return;
+    const maxLength = 8;
+    const parts = Math.max(1, Math.ceil(length / maxLength));
 
-    const mesh = new THREE.Mesh(baseGeometry, getMaterial(getPlayerColor(seg.owner)));
-    const midX = (seg.start.x + seg.end.x) / 2;
-    const midZ = (seg.start.y + seg.end.y) / 2;
+    for (let i = 0; i < parts; i += 1) {
+      const t0 = i / parts;
+      const t1 = (i + 1) / parts;
+      const startX = seg.start.x + dx * t0;
+      const startZ = seg.start.y + dz * t0;
+      const endX = seg.start.x + dx * t1;
+      const endZ = seg.start.y + dz * t1;
+      const segDx = endX - startX;
+      const segDz = endZ - startZ;
+      const segLength = Math.hypot(segDx, segDz);
+      if (segLength <= 0.0001) continue;
 
-    mesh.position.set(midX, height * 0.5 + 0.02, midZ);
-    mesh.rotation.y = -Math.atan2(dz, dx);
-    mesh.scale.set(length, 1, 1);
+      const key = `${seg.owner}-${seg.id}-${i}`;
+      if (segments.has(key)) continue;
 
-    scene.add(mesh);
-    segments.set(key, mesh);
+      const mesh = new THREE.Mesh(baseGeometry, getMaterial(getPlayerColor(seg.owner)));
+      const midX = (startX + endX) / 2;
+      const midZ = (startZ + endZ) / 2;
+
+      mesh.position.set(midX, height * 0.5 + 0.02, midZ);
+      mesh.rotation.y = -Math.atan2(segDz, segDx);
+      mesh.scale.set(segLength, 1, 1);
+
+      scene.add(mesh);
+      segments.set(key, mesh);
+    }
   };
 
   const update = (trails: TrailSegment[]) => {

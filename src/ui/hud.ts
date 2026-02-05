@@ -6,16 +6,12 @@ type StatusArgs = {
   roundDuration: number;
 };
 
-const formatCountdown = (seconds: number) => {
-  const clamped = Math.max(0, Math.ceil(seconds));
-  const mins = Math.floor(clamped / 60);
-  const secs = clamped % 60;
-  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
-};
+const formatMode = (mode: StatusArgs["mode"]) =>
+  mode === "LOCAL" ? "SINGLE PLAYER" : "MULTIPLAYER";
 
 export const formatStatus = (args: StatusArgs) => {
-  const remaining = args.roundDuration - args.time;
-  return `round ${formatCountdown(remaining)} | alive ${args.alive}/${args.total} | ${args.mode}`;
+  const remaining = Math.max(0, Math.ceil(args.roundDuration - args.time));
+  return `TIME: ${remaining} | ALIVE: ${args.alive}/${args.total} | ${formatMode(args.mode)}`;
 };
 
 export const createHUD = () => {

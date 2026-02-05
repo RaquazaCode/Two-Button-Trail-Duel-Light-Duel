@@ -10,6 +10,7 @@ import { createTrailRenderer } from "./render/trails";
 import { createChaseCameraController } from "./render/chaseCamera";
 import { CHASE_CONFIG } from "./render/chaseConfig";
 import { createHUD } from "./ui/hud";
+import { createMinimap } from "./ui/minimap";
 import {
   createMenu,
   createResult,
@@ -73,6 +74,7 @@ if (app) {
   const bikeRenderer = createBikeRenderer(scene);
   const trailRenderer = createTrailRenderer(scene);
   const hud = createHUD();
+  const minimap = createMinimap(app);
   const chaseCamera = createChaseCameraController(camera, CHASE_CONFIG);
 
   const onResize = () => {
@@ -109,6 +111,7 @@ if (app) {
       mode,
       roundDuration: CONFIG.roundDuration,
     });
+    minimap.update(next);
     composer.render();
   };
 

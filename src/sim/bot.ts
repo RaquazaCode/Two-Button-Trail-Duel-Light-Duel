@@ -3,6 +3,7 @@ import type { TrailSegment } from "./types";
 import { CONFIG } from "./config";
 import { stepPhysics } from "./physics";
 import { intersectsAny, outOfBounds } from "./collision";
+import { getDifficultyProfile, type Difficulty } from "./difficulty";
 
 const normalizeAngle = (angle: number) => {
   let value = angle % (Math.PI * 2);
@@ -20,8 +21,12 @@ export const chooseBotInput = (args: {
   trails: TrailSegment[];
   time: number;
   playerPos?: Vec2;
+  difficulty: Difficulty;
+  rng?: () => number;
 }): -1 | 0 | 1 => {
-  const lookahead = 0.5;
+  const rng = args.rng ?? Math.random;
+  const profile = getDifficultyProfile(args.difficulty);
+  const lookahead = 0.5 / profile.reactionScale;
   const dt = 1 / CONFIG.simHz;
   const steps = Math.max(1, Math.ceil(lookahead / dt));
   const candidates: Array<-1 | 0 | 1> = [-1, 0, 1];
@@ -59,6 +64,29 @@ export const chooseBotInput = (args: {
       const targetAngle = Math.atan2(args.playerPos.y - pos.y, args.playerPos.x - pos.x);
       const delta = Math.abs(normalizeAngle(targetAngle - heading));
       score += 0.2 * (1 - delta / Math.PI);
+    }
+
+    if (args.playerPos && safeSteps > 0) {
+      const dx = args.playerPos.x - pos.x;
+      const dy = args.playerPos.y - pos.y;
+      const distance = Math.hypot(dx, dy);
+      const targetAngle = Math.atan2(dy, dx);
+      const delta = normalizeAngle(targetAngle - heading);
+      const forwardBias = Math.max(0, 1 - Math.abs(delta) / Math.PI);
+      score += profile.pressure * 0.15 * forwardBias;
+
+      if (distance < CONFIG.speed * 6) {
+        const cutoffInput: -1 | 1 = delta >= 0 ? -1 : 1;
+        if (input === cutoffInput) {
+          score += profile.aggression * 0.25 * forwardBias;
+        }
+      }
+
+      if (input !== 0 && rng() < profile.cooperationChance) {
+        score += 0.12;
+      }
+
+      score *= 1 + profile.riskTolerance * 0.05;
     }
 
     return { input, score };

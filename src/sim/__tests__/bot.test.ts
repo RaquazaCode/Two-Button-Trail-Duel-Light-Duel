@@ -20,6 +20,7 @@ test("bot avoids a trail directly ahead", () => {
     ],
     time: 10,
     playerPos: vec2(40, 0),
+    difficulty: "EASY",
   });
   expect(input).not.toBe(0);
 });

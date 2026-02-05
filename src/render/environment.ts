@@ -1,8 +1,8 @@
 import * as THREE from "three";
-import { createEnvUpdateGate } from "./envGate";
 import { createReflectiveFloor } from "./floor";
 import { createGridOverlay } from "./grid";
 import { computeEnvironmentLayout } from "./environmentLayout";
+import { createStaticEnvMap } from "./envMap";
 import { createSkyline } from "./skyline";
 import { STADIUM_SETTINGS } from "./stadiumConfig";
 
@@ -13,18 +13,13 @@ export const createEnvironment = (
 ) => {
   const layout = computeEnvironmentLayout(arenaSize);
   scene.fog = new THREE.FogExp2(0x05080d, 0.006);
+  void renderer;
 
-  const envTarget = new THREE.WebGLCubeRenderTarget(512, {
-    format: THREE.RGBAFormat,
-    generateMipmaps: true,
-    minFilter: THREE.LinearMipmapLinearFilter,
-  });
-  const cubeCamera = new THREE.CubeCamera(1, 600, envTarget);
-  scene.add(cubeCamera);
+  const envMap = createStaticEnvMap(0x0b141f);
 
   const floor = createReflectiveFloor({
     size: layout.floorSize,
-    envMap: envTarget.texture,
+    envMap,
     roughness: 0.06,
     envMapIntensity: 1.8,
     color: 0x0b141f,
@@ -112,13 +107,8 @@ export const createEnvironment = (
   rim.position.y = layout.stadiumHeight;
   scene.add(rim);
 
-  const gate = createEnvUpdateGate({ stride: 5, maxFrameMs: 40, sampleSize: 5 });
-
   const update = (dtMs: number) => {
-    if (!gate.shouldUpdate(dtMs)) return;
-    floor.visible = false;
-    cubeCamera.update(renderer, scene);
-    floor.visible = true;
+    void dtMs;
   };
 
   return { update };

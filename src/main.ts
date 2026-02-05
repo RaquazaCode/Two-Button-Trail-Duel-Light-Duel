@@ -13,8 +13,10 @@ import { createHUD } from "./ui/hud";
 import {
   createMenu,
   createResult,
+  createDifficultyMenu,
   modeToUseServer,
   type ConnectionStatus,
+  type DifficultyOption,
   type ModeOption,
 } from "./ui/menu";
 import { chooseBotInput } from "./sim/bot";
@@ -86,9 +88,11 @@ if (app) {
   let input: -1 | 0 | 1 = 0;
   let connection: LightDuelConnection | null = null;
   let mode: ModeOption = CONFIG.useServer ? "ONLINE" : "LOCAL";
+  let difficulty: DifficultyOption = "EASY";
   let connectionStatus: ConnectionStatus = "DISCONNECTED";
   let lastFrame = performance.now();
   let menu: ReturnType<typeof createMenu>;
+  let difficultyMenu: ReturnType<typeof createDifficultyMenu> | null = null;
 
   const applyWorld = (next: WorldState) => {
     const now = performance.now();
@@ -124,6 +128,7 @@ if (app) {
           trails: world!.trails,
           time: world!.time,
           playerPos: player?.pos,
+          difficulty,
         });
       });
     return inputs;
@@ -208,6 +213,8 @@ if (app) {
     loop = null;
     void connection?.leave();
     connection = null;
+    difficultyMenu?.unmount();
+    difficultyMenu = null;
     lastFrame = performance.now();
     trailRenderer.reset();
     bikeRenderer.reset();
@@ -273,6 +280,26 @@ if (app) {
   });
   menu.mount(app);
   menu.onStart(() => {
+    if (mode === "LOCAL") {
+      menu.unmount();
+      difficultyMenu?.unmount();
+      difficultyMenu = createDifficultyMenu({ difficulty });
+      difficultyMenu.mount(app);
+      difficultyMenu.onDifficultyChange((next) => {
+        difficulty = next;
+      });
+      difficultyMenu.onStart(() => {
+        difficultyMenu?.unmount();
+        difficultyMenu = null;
+        startMatch();
+      });
+      difficultyMenu.onBack(() => {
+        difficultyMenu?.unmount();
+        difficultyMenu = null;
+        menu.mount(app);
+      });
+      return;
+    }
     startMatch();
   });
   if (shouldAutoStart(window.location.search)) {

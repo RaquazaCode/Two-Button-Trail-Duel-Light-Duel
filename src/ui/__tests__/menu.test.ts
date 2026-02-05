@@ -1,4 +1,4 @@
-import { coerceMode, formatConnectionStatus, modeToUseServer } from "../menu";
+import { coerceMode, formatConnectionStatus, formatModeLabel, modeToUseServer } from "../menu";
 
 test("coerceMode normalizes to LOCAL or ONLINE", () => {
   expect(coerceMode("ONLINE")).toBe("ONLINE");
@@ -9,6 +9,11 @@ test("coerceMode normalizes to LOCAL or ONLINE", () => {
 test("modeToUseServer maps ONLINE to true", () => {
   expect(modeToUseServer("ONLINE")).toBe(true);
   expect(modeToUseServer("LOCAL")).toBe(false);
+});
+
+test("mode labels are user friendly", () => {
+  expect(formatModeLabel("LOCAL")).toBe("Single Player");
+  expect(formatModeLabel("ONLINE")).toBe("Online (Multiplayer)");
 });
 
 test("formatConnectionStatus renders human labels", () => {

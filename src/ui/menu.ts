@@ -6,6 +6,7 @@ export type MenuState = {
 };
 
 export type ModeOption = "LOCAL" | "ONLINE";
+export type DifficultyOption = "EASY" | "MEDIUM" | "HARD";
 export type ConnectionStatus = "DISCONNECTED" | "CONNECTING" | "CONNECTED";
 export type ResultStatus = "VICTORY" | "ELIMINATED" | "TIME_UP";
 
@@ -43,6 +44,9 @@ export const formatResultCause = (args: {
 
 export const getResultActions = () => ["Play Again", "Main Menu"] as const;
 
+export const formatModeLabel = (mode: ModeOption) =>
+  mode === "LOCAL" ? "Single Player" : "Online (Multiplayer)";
+
 export const coerceMode = (value: string): ModeOption =>
   value === "ONLINE" ? "ONLINE" : "LOCAL";
 
@@ -57,7 +61,9 @@ export const formatConnectionStatus = (status: ConnectionStatus) => {
 export const createMenu = (args: MenuState) => {
   const overlay = document.createElement("div");
   const modeButton = (mode: ModeOption) =>
-    `<button type="button" class="mode-button${args.mode === mode ? " active" : ""}" data-mode="${mode}">${mode}</button>`;
+    `<button type="button" class="mode-button${args.mode === mode ? " active" : ""}" data-mode="${mode}">${formatModeLabel(
+      mode
+    )}</button>`;
 
   overlay.className = "menu";
   overlay.innerHTML = `
@@ -111,6 +117,68 @@ export const createMenu = (args: MenuState) => {
   };
 
   return { mount, unmount, onStart, onModeChange, setStatus };
+};
+
+export const createDifficultyMenu = (args: {
+  difficulty: DifficultyOption;
+}) => {
+  const overlay = document.createElement("div");
+  const difficultyButton = (difficulty: DifficultyOption) =>
+    `<button type=\"button\" class=\"difficulty-button${args.difficulty === difficulty ? " active" : ""}\" data-difficulty=\"${difficulty}\">${difficulty}</button>`;
+
+  overlay.className = "menu";
+  overlay.innerHTML = `
+    <div class="menu-card">
+      <h2>Single Player</h2>
+      <p class="menu-sub">Select Difficulty</p>
+      <div class="difficulty-row" role="group" aria-label="Difficulty">
+        ${difficultyButton("EASY")}
+        ${difficultyButton("MEDIUM")}
+        ${difficultyButton("HARD")}
+      </div>
+      <p class="menu-sub difficulty-desc" id="difficulty-desc"></p>
+      <button id="difficulty-start">Start Match</button>
+      <button id="difficulty-back">Back to Main Menu</button>
+    </div>
+  `;
+
+  const mount = (container: HTMLElement) => container.appendChild(overlay);
+  const unmount = () => overlay.remove();
+
+  const setDescription = (value: DifficultyOption) => {
+    const node = overlay.querySelector<HTMLParagraphElement>("#difficulty-desc");
+    if (!node) return;
+    if (value === "EASY") node.textContent = "Balanced bots with safer paths.";
+    if (value === "MEDIUM") node.textContent = "More pressure and cut-offs.";
+    if (value === "HARD") node.textContent = "Fast reactions and traps.";
+  };
+
+  setDescription(args.difficulty);
+
+  const onDifficultyChange = (handler: (difficulty: DifficultyOption) => void) => {
+    const buttons = overlay.querySelectorAll<HTMLButtonElement>(".difficulty-button");
+    buttons.forEach((button) => {
+      button.onclick = () => {
+        const next = button.dataset.difficulty as DifficultyOption;
+        buttons.forEach((node) => node.classList.remove("active"));
+        button.classList.add("active");
+        setDescription(next);
+        handler(next);
+      };
+    });
+  };
+
+  const onStart = (handler: () => void) => {
+    const btn = overlay.querySelector<HTMLButtonElement>("#difficulty-start");
+    if (btn) btn.onclick = handler;
+  };
+
+  const onBack = (handler: () => void) => {
+    const btn = overlay.querySelector<HTMLButtonElement>("#difficulty-back");
+    if (btn) btn.onclick = handler;
+  };
+
+  return { mount, unmount, onDifficultyChange, onStart, onBack };
 };
 
 export const createResult = (args: {

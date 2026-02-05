@@ -2,9 +2,7 @@ import * as THREE from "three";
 
 type FloorArgs = {
   size: number;
-  envMap: THREE.Texture;
   roughness: number;
-  envMapIntensity: number;
   color: number;
 };
 
@@ -14,8 +12,6 @@ export const createReflectiveFloor = (args: FloorArgs) => {
     color: args.color,
     metalness: 1,
     roughness: args.roughness,
-    envMap: args.envMap,
-    envMapIntensity: args.envMapIntensity,
   });
 
   material.onBeforeCompile = (shader) => {

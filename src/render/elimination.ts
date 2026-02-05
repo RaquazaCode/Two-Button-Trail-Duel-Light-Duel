@@ -5,6 +5,16 @@ import { getPlayerColor } from "./palette";
 export const FLASH_DURATION = 0.12;
 export const BURST_DURATION = 0.8;
 export const SHOCK_DURATION = 0.25;
+const SOUND_COOLDOWN = 0.15;
+
+export const shouldPlayEliminationSound = (
+  lastPlayedAt: number | null,
+  now: number,
+  cooldown: number
+) => {
+  if (lastPlayedAt == null) return true;
+  return now - lastPlayedAt >= cooldown;
+};
 
 export const getFlashIntensity = (elapsed: number) => {
   if (elapsed <= 0) return 1;
@@ -154,6 +164,7 @@ const createEffect = (id: string, color: number, position: THREE.Vector3): Effec
 export const createEliminationEffects = (scene: THREE.Scene) => {
   const effects = new Map<string, Effect>();
   const audioContext = createAudio();
+  let lastSoundAt: number | null = null;
 
   const update = (players: PlayerState[], time: number) => {
     players.forEach((player) => {
@@ -167,7 +178,10 @@ export const createEliminationEffects = (scene: THREE.Scene) => {
       effect.startTime = player.eliminatedAt;
       effects.set(player.id, effect);
       scene.add(effect.group);
-      playEliminationSound(audioContext);
+      if (shouldPlayEliminationSound(lastSoundAt, time, SOUND_COOLDOWN)) {
+        playEliminationSound(audioContext);
+        lastSoundAt = time;
+      }
     });
 
     effects.forEach((effect, id) => {

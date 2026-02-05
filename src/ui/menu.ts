@@ -87,6 +87,7 @@ export const createMenu = (args: MenuState) => {
       </div>
       <p class="menu-status" id="menu-status">${formatConnectionStatus(args.status)}</p>
       <button id="start-btn">Start Match</button>
+      <button id="diagnostics-btn" class="secondary">Connection Issues / Lag?</button>
     </div>
   `;
 
@@ -110,13 +111,18 @@ export const createMenu = (args: MenuState) => {
     });
   };
 
+  const onDiagnostics = (handler: () => void) => {
+    const btn = overlay.querySelector<HTMLButtonElement>("#diagnostics-btn");
+    if (btn) btn.onclick = handler;
+  };
+
   const setStatus = (status: ConnectionStatus) => {
     const node = overlay.querySelector<HTMLParagraphElement>("#menu-status");
     if (!node) return;
     node.textContent = formatConnectionStatus(status);
   };
 
-  return { mount, unmount, onStart, onModeChange, setStatus };
+  return { mount, unmount, onStart, onModeChange, onDiagnostics, setStatus };
 };
 
 export const createDifficultyMenu = (args: {

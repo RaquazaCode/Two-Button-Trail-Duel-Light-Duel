@@ -12,6 +12,7 @@ import { CHASE_CONFIG } from "./render/chaseConfig";
 import { createHUD } from "./ui/hud";
 import { createMinimap } from "./ui/minimap";
 import { createEliminationEffects } from "./render/elimination";
+import { createDiagnosticsPanel } from "./ui/diagnostics";
 import {
   createMenu,
   createResult,
@@ -30,6 +31,8 @@ import { shouldAutoStart } from "./game/autostart";
 import { connectLightDuel, type LightDuelConnection } from "./net/colyseus";
 import { snapshotToWorld } from "./net/snapshot";
 import { generateSpawnPoints } from "./game/spawn";
+import { createPerfTracker } from "./game/perf";
+import { formatDiagnostics, type DiagnosticsSnapshot } from "./game/diagnostics";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -79,6 +82,16 @@ if (app) {
   const hud = createHUD();
   const minimap = createMinimap(app);
   const chaseCamera = createChaseCameraController(camera, CHASE_CONFIG);
+  const perfTracker = createPerfTracker();
+  const lastMatch = { survival: 0, status: "N/A", eliminationReason: null as string | null };
+  const gl = renderer.getContext();
+  const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+  const rendererInfo = {
+    vendor: debugInfo ? (gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) as string) : "unknown",
+    renderer: debugInfo ? (gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) as string) : "unknown",
+    glVersion: gl.getParameter(gl.VERSION) as string,
+    maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE) as number,
+  };
 
   const onResize = () => {
     resize();
@@ -100,10 +113,70 @@ if (app) {
   let menu: ReturnType<typeof createMenu>;
   let difficultyMenu: ReturnType<typeof createDifficultyMenu> | null = null;
 
+  const buildDiagnosticsSnapshot = (): DiagnosticsSnapshot => {
+    const perf = perfTracker.snapshot();
+    const connectionInfo = (navigator as Navigator & { connection?: { rtt?: number } })
+      .connection;
+    return {
+      timestamp: new Date().toISOString(),
+      perf: {
+        fps: perf.fps,
+        frameMs: perf.frameMs,
+        updateMs: perf.updateMs,
+        renderMs: perf.renderMs,
+      },
+      game: {
+        mode,
+        difficulty,
+        players: perf.players,
+        trails: perf.trails,
+        arenaSize: CONFIG.arenaSize,
+      },
+      system: {
+        userAgent: navigator.userAgent,
+        hardwareConcurrency: navigator.hardwareConcurrency ?? null,
+        deviceMemory: (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? null,
+        language: navigator.language,
+        platform: navigator.platform,
+      },
+      display: {
+        width: renderer.domElement.width,
+        height: renderer.domElement.height,
+        pixelRatio: window.devicePixelRatio || 1,
+      },
+      memory: {
+        geometries: renderer.info.memory.geometries,
+        textures: renderer.info.memory.textures,
+      },
+      connection: {
+        status: connectionStatus,
+        serverUrl: CONFIG.serverUrl,
+        rttMs: connectionInfo?.rtt ?? null,
+      },
+      renderer: {
+        vendor: rendererInfo.vendor,
+        renderer: rendererInfo.renderer,
+        glVersion: rendererInfo.glVersion,
+        maxTextureSize: rendererInfo.maxTextureSize,
+        drawCalls: renderer.info.render.calls,
+        triangles: renderer.info.render.triangles,
+      },
+      lastMatch: {
+        survival: lastMatch.survival,
+        status: lastMatch.status,
+        eliminationReason: lastMatch.eliminationReason,
+      },
+    };
+  };
+
+  const diagnosticsPanel = createDiagnosticsPanel({
+    getText: () => formatDiagnostics(buildDiagnosticsSnapshot()),
+  });
+
   const applyWorld = (next: WorldState) => {
-    const now = performance.now();
-    const dtMs = Math.max(1, now - lastFrame);
-    lastFrame = now;
+    const frameStart = performance.now();
+    const dtMs = Math.max(1, frameStart - lastFrame);
+    lastFrame = frameStart;
     chaseCamera.update(next, dtMs / 1000);
     environment.update(dtMs);
     bikeRenderer.update(next.players, next.time);
@@ -117,7 +190,16 @@ if (app) {
       roundDuration: CONFIG.roundDuration,
     });
     minimap.update(next);
+    const renderStart = performance.now();
     composer.render();
+    const frameEnd = performance.now();
+    perfTracker.record({
+      frameMs: dtMs,
+      updateMs: renderStart - frameStart,
+      renderMs: frameEnd - renderStart,
+      players: next.players.length,
+      trails: next.trails.length,
+    });
   };
 
   const getInputs = () => {
@@ -204,6 +286,9 @@ if (app) {
       eliminationReason: outcome.eliminationReason,
       eliminatedBy: outcome.eliminatedBy,
     });
+    lastMatch.survival = outcome.survival;
+    lastMatch.status = outcome.status;
+    lastMatch.eliminationReason = outcome.eliminationReason ?? null;
     result.mount(app);
     result.onRestart(() => {
       result.unmount();
@@ -293,6 +378,10 @@ if (app) {
     menu.setStatus(connectionStatus);
   });
   menu.mount(app);
+  menu.onDiagnostics(() => {
+    diagnosticsPanel.mount(app);
+    diagnosticsPanel.onClose(() => diagnosticsPanel.unmount());
+  });
   menu.onStart(() => {
     if (mode === "LOCAL") {
       menu.unmount();

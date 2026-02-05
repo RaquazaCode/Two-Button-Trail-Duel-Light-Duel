@@ -51,6 +51,17 @@ export const chooseBotInput = (args: {
   const sampleCount = args.difficulty === "HARD" ? 6 : 1;
 
   const scoreCandidate = (input: -1 | 0 | 1) => {
+    if (role === "ROAMER" && args.playerPos && input === 0) {
+      const dx = args.playerPos.x - args.pos.x;
+      const dy = args.playerPos.y - args.pos.y;
+      const distance = Math.hypot(dx, dy);
+      const targetAngle = Math.atan2(dy, dx);
+      const delta = Math.abs(normalizeAngle(targetAngle - args.heading));
+      const avoidRadius = CONFIG.speed * 8;
+      if (distance < avoidRadius && delta < Math.PI / 6) {
+        return -1;
+      }
+    }
     let total = 0;
     for (let sample = 0; sample < sampleCount; sample += 1) {
       let pos = args.pos;
@@ -106,6 +117,20 @@ export const chooseBotInput = (args: {
           if (input === cutoffInput) {
             score += profile.aggression * 0.3 * forwardBias;
           }
+        }
+      }
+
+      if (role === "ROAMER" && args.playerPos && safeSteps > 0) {
+        const dx = args.playerPos.x - pos.x;
+        const dy = args.playerPos.y - pos.y;
+        const distance = Math.hypot(dx, dy);
+        const avoidRadius = CONFIG.speed * 10;
+        if (distance < avoidRadius) {
+          const targetAngle = Math.atan2(dy, dx);
+          const delta = Math.abs(normalizeAngle(targetAngle - heading));
+          const toward = Math.max(0, 1 - delta / Math.PI);
+          const proximity = 1 - distance / avoidRadius;
+          score -= (0.9 + profile.pressure * 0.3) * toward * proximity;
         }
       }
 

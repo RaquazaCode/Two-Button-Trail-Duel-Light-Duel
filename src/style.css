@@ -171,12 +171,48 @@ body {
   text-shadow: 0 0 6px var(--ui-accent), 0 0 18px var(--ui-accent);
 }
 
+.menu button.secondary {
+  border-color: rgba(155, 231, 255, 0.5);
+  background: rgba(155, 231, 255, 0.08);
+  color: var(--ui-secondary);
+}
+
 .menu button:hover {
   background: rgba(0, 245, 255, 0.2);
 }
 
 .menu button + button {
   margin-top: 10px;
+}
+
+.diagnostics-card {
+  width: min(720px, 94vw);
+  text-align: left;
+}
+
+.diagnostics-text {
+  margin: 16px 0;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 229, 255, 0.2);
+  background: rgba(4, 10, 16, 0.85);
+  color: var(--ui-primary);
+  font-size: clamp(14px, 1.9vh, 22px);
+  line-height: 1.4;
+  white-space: pre-wrap;
+  max-height: 46vh;
+  overflow: auto;
+  text-shadow: 0 0 6px rgba(0, 229, 255, 0.4);
+}
+
+.diagnostics-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.diagnostics-actions button {
+  margin-top: 0;
 }
 
 .difficulty-row {

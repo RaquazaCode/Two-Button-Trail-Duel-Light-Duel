@@ -34,3 +34,8 @@ TODO:
 - 2026-02-05: Rebuilt skyline as InstancedMesh silhouettes (single geometry/material) with procedural emissive striping and raised base heights; reduced skyline counts for performance.
 - 2026-02-05: Replaced realtime cube reflections with a static env map for the floor.
 - 2026-02-05: Trail renderer now splits long segments to prevent invisible collisions.
+- 2026-02-05: Added diagnostics panel (Connection Issues / Lag?) with perf/system/render stats, plus perf tracker and formatter.
+- 2026-02-05: Fixed skyline shader worldPos compile error and removed static env-map usage to avoid WebGL cube-texture errors.
+- 2026-02-05: Spawn algorithm upgraded (best-candidate spacing + fallback ring) to ensure all 8 bots spawn with minimum spacing; roamers now avoid aiming directly at player.
+- 2026-02-05: Elimination audio gated with cooldown to prevent rapid clicking.
+- 2026-02-05: Playwright autostart captures in output/web-game-diagnostics-2 (shots 0-1). Vitest run with --pool=threads --maxWorkers=1 for new tests.

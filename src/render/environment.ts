@@ -15,13 +15,9 @@ export const createEnvironment = (
   scene.fog = new THREE.FogExp2(0x05080d, 0.006);
   void renderer;
 
-  const envMap = createStaticEnvMap(0x0b141f);
-
   const floor = createReflectiveFloor({
     size: layout.floorSize,
-    envMap,
     roughness: 0.06,
-    envMapIntensity: 1.8,
     color: 0x0b141f,
   });
   scene.add(floor);

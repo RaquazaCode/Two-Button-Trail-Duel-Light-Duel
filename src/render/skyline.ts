@@ -37,7 +37,7 @@ export const createSkyline = (args: SkylineArgs) => {
     );
     shader.vertexShader = shader.vertexShader.replace(
       "#include <worldpos_vertex>",
-      `#include <worldpos_vertex>\n vWorldPos = worldPosition.xyz;`
+      `#include <worldpos_vertex>\n vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;`
     );
     shader.fragmentShader = shader.fragmentShader.replace(
       "#include <common>",

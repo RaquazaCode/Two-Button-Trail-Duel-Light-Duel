@@ -9,10 +9,14 @@ test("computeEnvironmentLayout scales arena visuals", () => {
   expect(layout.stadiumRadius).toBeCloseTo(125);
   expect(layout.stadiumTube).toBeCloseTo(10);
   expect(layout.stadiumHeight).toBeCloseTo(18);
-  expect(layout.skylineLayers.length).toBe(3);
-  expect(layout.skylineLayers[0].radius).toBeCloseTo(275);
-  expect(layout.skylineLayers[1].radius).toBeCloseTo(400);
-  expect(layout.skylineLayers[2].radius).toBeCloseTo(550);
+  expect(layout.skylineLayers.length).toBe(4);
+  expect(layout.skylineLayers[0].radius).toBeCloseTo(225);
+  expect(layout.skylineLayers[1].radius).toBeCloseTo(275);
+  expect(layout.skylineLayers[2].radius).toBeCloseTo(400);
+  expect(layout.skylineLayers[3].radius).toBeCloseTo(550);
+  layout.skylineLayers.forEach((layer) => {
+    expect(layer.baseHeight).toBeGreaterThan(0);
+  });
 });
 
 test("computeEnvironmentLayout caps skyline counts for huge arenas", () => {

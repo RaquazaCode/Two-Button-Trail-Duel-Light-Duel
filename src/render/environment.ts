@@ -44,6 +44,7 @@ export const createEnvironment = (
   grid.position.y = 0.03;
   scene.add(grid);
 
+  const layerColors = [0x7cf8ff, 0x5fe8ff, 0x5bd3ff, 0x4fb6ff];
   layout.skylineLayers.forEach((layer, index) => {
     const skyline = createSkyline({
       radius: layer.radius,
@@ -51,18 +52,14 @@ export const createEnvironment = (
       minHeight: layer.minHeight,
       maxHeight: layer.maxHeight,
       color: 0x0d1824,
-      emissive: 0x3af7ff,
+      emissive: layerColors[index % layerColors.length],
       opacity: layer.opacity,
-      stripCount: layer.stripCount,
-      billboardCount: layer.billboardCount,
-      billboardColor: index === 0 ? 0xffd26e : index === 1 ? 0xff79c6 : 0x7cf8ff,
+      baseHeight: layer.baseHeight,
     });
-    skyline.children.forEach((child) => {
-      const mesh = child as THREE.Mesh;
-      if (mesh.material && (mesh.material as THREE.MeshStandardMaterial).emissiveIntensity != null) {
-        (mesh.material as THREE.MeshStandardMaterial).emissiveIntensity = 0.55 + index * 0.15;
-      }
-    });
+    const material = skyline.material as THREE.MeshStandardMaterial;
+    if (material.emissiveIntensity != null) {
+      material.emissiveIntensity = 0.55 + index * 0.15;
+    }
     scene.add(skyline);
   });
 
@@ -89,14 +86,14 @@ export const createEnvironment = (
     new THREE.CylinderGeometry(layout.stadiumRadius, layout.stadiumRadius, lowerHeight, 96, 1, true),
     baseMaterial
   );
-  lowerBand.position.y = lowerHeight * 0.5 - 0.2;
+  lowerBand.position.y = lowerHeight * 0.5;
   scene.add(lowerBand);
 
   const upperBand = new THREE.Mesh(
     new THREE.CylinderGeometry(layout.stadiumRadius, layout.stadiumRadius, upperHeight, 96, 1, true),
     topMaterial
   );
-  upperBand.position.y = lowerHeight + upperHeight * 0.5 - 0.2;
+  upperBand.position.y = lowerHeight + upperHeight * 0.5;
   scene.add(upperBand);
 
   const rimMaterial = new THREE.MeshStandardMaterial({
@@ -112,7 +109,7 @@ export const createEnvironment = (
     rimMaterial
   );
   rim.rotation.x = Math.PI / 2;
-  rim.position.y = layout.stadiumHeight - 0.2;
+  rim.position.y = layout.stadiumHeight;
   scene.add(rim);
 
   const gate = createEnvUpdateGate({ stride: 5, maxFrameMs: 40, sampleSize: 5 });

@@ -8,9 +8,7 @@ type SkylineArgs = {
   color: number;
   emissive: number;
   opacity?: number;
-  stripCount?: number;
-  billboardCount?: number;
-  billboardColor?: number;
+  baseHeight?: number;
 };
 
 const noise = (seed: number) => {
@@ -19,10 +17,44 @@ const noise = (seed: number) => {
 };
 
 export const createSkyline = (args: SkylineArgs) => {
-  const group = new THREE.Group();
-  const stripCount = args.stripCount ?? 2;
-  const billboardCount = args.billboardCount ?? 1;
-  const billboardColor = args.billboardColor ?? args.emissive;
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshStandardMaterial({
+    color: args.color,
+    emissive: args.emissive,
+    emissiveIntensity: 0.6,
+    metalness: 0.2,
+    roughness: 0.7,
+    transparent: args.opacity !== undefined,
+    opacity: args.opacity ?? 1,
+  });
+
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uStripeColor = { value: new THREE.Color(args.emissive) };
+    shader.uniforms.uStripeIntensity = { value: 0.55 };
+    shader.vertexShader = shader.vertexShader.replace(
+      "#include <common>",
+      `#include <common>\nvarying vec3 vWorldPos;`
+    );
+    shader.vertexShader = shader.vertexShader.replace(
+      "#include <worldpos_vertex>",
+      `#include <worldpos_vertex>\n vWorldPos = worldPosition.xyz;`
+    );
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <common>",
+      `#include <common>\nuniform vec3 uStripeColor;\nuniform float uStripeIntensity;\nvarying vec3 vWorldPos;`
+    );
+    shader.fragmentShader = shader.fragmentShader.replace(
+      "#include <emissivemap_fragment>",
+      `#include <emissivemap_fragment>\n float stripe = step(0.86, abs(sin(vWorldPos.y * 0.22 + (vWorldPos.x + vWorldPos.z) * 0.02)));\n totalEmissiveRadiance += uStripeColor * stripe * uStripeIntensity;`
+    );
+  };
+
+  const mesh = new THREE.InstancedMesh(geometry, material, args.count);
+  const matrix = new THREE.Matrix4();
+  const position = new THREE.Vector3();
+  const rotation = new THREE.Quaternion();
+  const scale = new THREE.Vector3();
+  const baseHeight = args.baseHeight ?? 0;
 
   for (let i = 0; i < args.count; i += 1) {
     const angle = (i / args.count) * Math.PI * 2;
@@ -32,67 +64,13 @@ export const createSkyline = (args: SkylineArgs) => {
     const width = 6 + noise(i + 11) * 8;
     const depth = 6 + noise(i + 17) * 8;
 
-    const material = new THREE.MeshStandardMaterial({
-      color: args.color,
-      emissive: args.emissive,
-      emissiveIntensity: 0.2,
-      metalness: 0.2,
-      roughness: 0.7,
-      transparent: args.opacity !== undefined,
-      opacity: args.opacity ?? 1,
-    });
-
-    const accentMaterial = new THREE.MeshStandardMaterial({
-      color: 0xeafcff,
-      emissive: args.emissive,
-      emissiveIntensity: 1.35,
-      metalness: 0.1,
-      roughness: 0.3,
-      transparent: args.opacity !== undefined,
-      opacity: args.opacity ?? 1,
-    });
-
-    const billboardMaterial = new THREE.MeshStandardMaterial({
-      color: 0x0b1018,
-      emissive: billboardColor,
-      emissiveIntensity: 0.3,
-      metalness: 0.1,
-      roughness: 0.25,
-      side: THREE.DoubleSide,
-      transparent: args.opacity !== undefined,
-      opacity: args.opacity ?? 1,
-    });
-
-    const building = new THREE.Group();
-    const base = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), material);
-    base.position.y = height / 2;
-    building.add(base);
-
-    for (let s = 0; s < stripCount; s += 1) {
-      const stripWidth = Math.max(0.4, width * 0.08);
-      const stripDepth = depth * 1.02;
-      const strip = new THREE.Mesh(
-        new THREE.BoxGeometry(stripWidth, height * 0.9, stripDepth),
-        accentMaterial
-      );
-      const offset = (s / Math.max(1, stripCount - 1)) * 0.8 - 0.4;
-      strip.position.set(width * 0.35 * offset, height * 0.45, 0);
-      building.add(strip);
-    }
-
-    for (let b = 0; b < billboardCount; b += 1) {
-      const boardWidth = Math.max(1.2, width * 0.5);
-      const boardHeight = Math.max(0.6, height * 0.12);
-      const board = new THREE.Mesh(new THREE.PlaneGeometry(boardWidth, boardHeight), billboardMaterial);
-      const side = b % 2 === 0 ? 1 : -1;
-      board.position.set(0, height * (0.4 + b * 0.15), (depth * 0.55) * side);
-      board.rotation.y = Math.PI / 2;
-      building.add(board);
-    }
-
-    building.position.set(Math.cos(angle) * radius, 0, Math.sin(angle) * radius);
-    group.add(building);
+    position.set(Math.cos(angle) * radius, baseHeight + height * 0.5, Math.sin(angle) * radius);
+    rotation.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -angle);
+    scale.set(width, height, depth);
+    matrix.compose(position, rotation, scale);
+    mesh.setMatrixAt(i, matrix);
   }
+  mesh.instanceMatrix.needsUpdate = true;
 
-  return group;
+  return mesh;
 };

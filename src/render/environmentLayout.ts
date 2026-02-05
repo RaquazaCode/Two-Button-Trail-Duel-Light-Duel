@@ -17,6 +17,7 @@ export type EnvironmentLayout = {
     opacity: number;
     stripCount: number;
     billboardCount: number;
+    baseHeight: number;
   }>;
 };
 
@@ -39,31 +40,44 @@ export const computeEnvironmentLayout = (arenaSize: number): EnvironmentLayout =
     stadiumHeight: 18,
     skylineLayers: [
       {
+        radius: arenaHalf * 1.8,
+        count: capCount(Math.round(arenaSize / 10)),
+        minHeight: 60,
+        maxHeight: 150,
+        opacity: 0.95,
+        stripCount: 4,
+        billboardCount: 1,
+        baseHeight: 10,
+      },
+      {
         radius: arenaHalf * 2.2,
-        count: capCount(Math.round(arenaSize / 7)),
+        count: capCount(Math.round(arenaSize / 9)),
         minHeight: 50,
         maxHeight: 130,
         opacity: 0.95,
         stripCount: 3,
         billboardCount: 1,
+        baseHeight: 12,
       },
       {
         radius: arenaHalf * 3.2,
-        count: capCount(Math.round(arenaSize / 6)),
+        count: capCount(Math.round(arenaSize / 8)),
         minHeight: 70,
         maxHeight: 170,
         opacity: 0.75,
         stripCount: 4,
         billboardCount: 1,
+        baseHeight: 16,
       },
       {
         radius: arenaHalf * 4.4,
-        count: capCount(Math.round(arenaSize / 5)),
+        count: capCount(Math.round(arenaSize / 7)),
         minHeight: 90,
         maxHeight: 210,
         opacity: 0.6,
         stripCount: 4,
         billboardCount: 1,
+        baseHeight: 22,
       },
     ],
   };

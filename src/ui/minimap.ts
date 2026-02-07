@@ -51,7 +51,7 @@ export const createMinimap = (container: HTMLElement) => {
   const update = (world?: WorldState | null) => {
     if (!ctx) return;
     const now = performance.now();
-    if (world && now - lastUpdateAt < 90) return;
+    if (world && now - lastUpdateAt < 60) return;
     lastUpdateAt = now;
     clear();
     if (!world) return;
@@ -69,10 +69,7 @@ export const createMinimap = (container: HTMLElement) => {
     ctx.clip();
 
     ctx.lineWidth = 1.5;
-    const maxTrailDraw = 420;
-    const step = Math.max(1, Math.ceil(world.trails.length / maxTrailDraw));
-    for (let i = 0; i < world.trails.length; i += step) {
-      const trail = world.trails[i];
+    for (const trail of world.trails) {
       const start = worldToMinimap(trail.start, world.arenaHalf);
       const end = worldToMinimap(trail.end, world.arenaHalf);
       let stroke = trailColorCache.get(trail.owner);

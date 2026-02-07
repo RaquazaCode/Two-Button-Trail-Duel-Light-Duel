@@ -35,15 +35,18 @@ import { createPerfTracker } from "./game/perf";
 import { formatDiagnostics, type DiagnosticsSnapshot } from "./game/diagnostics";
 import { createBotDecisionCache } from "./game/botDecisionCache";
 import { TOTAL_PLAYERS } from "./game/playerContract";
+import { applyTrailLifetimeForDifficulty } from "./game/trailDifficulty";
 
 const app = document.querySelector<HTMLDivElement>("#app");
+const LOCAL_SPAWN_MIN_DISTANCE = CONFIG.arenaSize * 0.18;
+const LOCAL_SPAWN_MARGIN = CONFIG.arenaSize * 0.16;
 
 const createPlayers = (): PlayerState[] => {
   const spawns = generateSpawnPoints({
     count: TOTAL_PLAYERS,
     arenaHalf: CONFIG.arenaSize / 2,
-    minDistance: CONFIG.speed * 3.5,
-    margin: CONFIG.speed * 3,
+    minDistance: LOCAL_SPAWN_MIN_DISTANCE,
+    margin: LOCAL_SPAWN_MARGIN,
   });
 
   if (spawns.length !== TOTAL_PLAYERS) {
@@ -112,6 +115,7 @@ if (app) {
   let connection: LightDuelConnection | null = null;
   let mode: ModeOption = CONFIG.useServer ? "ONLINE" : "LOCAL";
   let difficulty: DifficultyOption = "EASY";
+  applyTrailLifetimeForDifficulty(difficulty);
   let botRoles = new Map<string, BotRole>();
   let botDecisionCache = createBotDecisionCache(difficulty);
   let connectionStatus: ConnectionStatus = "DISCONNECTED";
@@ -330,6 +334,7 @@ if (app) {
 
     input = 0;
     botDecisionCache = createBotDecisionCache(difficulty);
+    applyTrailLifetimeForDifficulty(difficulty);
     bindInputHandlers();
 
     if (modeToUseServer(mode)) {
@@ -405,6 +410,7 @@ if (app) {
       difficultyMenu.mount(app);
       difficultyMenu.onDifficultyChange((next) => {
         difficulty = next;
+        applyTrailLifetimeForDifficulty(difficulty);
       });
       difficultyMenu.onStart(() => {
         difficultyMenu?.unmount();

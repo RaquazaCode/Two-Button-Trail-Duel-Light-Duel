@@ -1,7 +1,7 @@
 export const CONFIG = {
   arenaSize: 1800,
   speed: 68,
-  turnRate: 9.0,
+  turnRate: 8.8,
   turnInertia: 0.12,
   trailWidth: 0.6,
   trailLifetime: 45,

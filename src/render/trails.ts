@@ -12,8 +12,10 @@ export const createTrailRenderer = (scene: THREE.Scene) => {
   const baseGeometry = new THREE.BoxGeometry(1, height, CONFIG.trailWidth);
   const baseMaterial = new THREE.MeshBasicMaterial({
     color: 0xffffff,
+    opacity: 0.96,
     transparent: true,
     blending: THREE.AdditiveBlending,
+    depthTest: false,
     depthWrite: false,
     vertexColors: true,
   });
@@ -22,6 +24,7 @@ export const createTrailRenderer = (scene: THREE.Scene) => {
   const mesh = new THREE.InstancedMesh(baseGeometry, baseMaterial, MAX_TRAIL_INSTANCES);
   mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
   mesh.frustumCulled = false;
+  mesh.renderOrder = 5;
   mesh.count = 0;
   scene.add(mesh);
 

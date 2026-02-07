@@ -9,6 +9,24 @@ export const worldToMinimap = (pos: Vec2, arenaHalf: number): MinimapPoint => {
   return { x: pos.x / arenaHalf, y: pos.y / arenaHalf };
 };
 
+export const projectToPlayerMinimap = (args: {
+  worldPos: Vec2;
+  playerPos: Vec2;
+  playerHeading: number;
+  arenaHalf: number;
+}): MinimapPoint => {
+  if (args.arenaHalf <= 0) return { x: 0, y: 0 };
+  const dx = args.worldPos.x - args.playerPos.x;
+  const dy = args.worldPos.y - args.playerPos.y;
+  const rotation = Math.PI / 2 - args.playerHeading;
+  const cos = Math.cos(rotation);
+  const sin = Math.sin(rotation);
+  return {
+    x: (dx * cos - dy * sin) / args.arenaHalf,
+    y: (dx * sin + dy * cos) / args.arenaHalf,
+  };
+};
+
 const colorToRgba = (color: number, alpha: number) => {
   const hex = color.toString(16).padStart(6, "0");
   const r = parseInt(hex.slice(0, 2), 16);
@@ -58,6 +76,9 @@ export const createMinimap = (container: HTMLElement) => {
 
     const radius = size * 0.5 - 6;
     const center = size * 0.5;
+    const pov = world.players.find((player) => player.id === "p1") ?? world.players[0];
+    const povPos = pov?.pos ?? { x: 0, y: 0 };
+    const povHeading = pov?.heading ?? 0;
 
     ctx.save();
     ctx.translate(center, center);
@@ -70,8 +91,18 @@ export const createMinimap = (container: HTMLElement) => {
 
     ctx.lineWidth = 1.5;
     for (const trail of world.trails) {
-      const start = worldToMinimap(trail.start, world.arenaHalf);
-      const end = worldToMinimap(trail.end, world.arenaHalf);
+      const start = projectToPlayerMinimap({
+        worldPos: trail.start,
+        playerPos: povPos,
+        playerHeading: povHeading,
+        arenaHalf: world.arenaHalf,
+      });
+      const end = projectToPlayerMinimap({
+        worldPos: trail.end,
+        playerPos: povPos,
+        playerHeading: povHeading,
+        arenaHalf: world.arenaHalf,
+      });
       let stroke = trailColorCache.get(trail.owner);
       if (!stroke) {
         stroke = colorToRgba(getPlayerColor(trail.owner), 0.85);
@@ -85,7 +116,12 @@ export const createMinimap = (container: HTMLElement) => {
     }
 
     world.players.forEach((player) => {
-      const point = worldToMinimap(player.pos, world.arenaHalf);
+      const point = projectToPlayerMinimap({
+        worldPos: player.pos,
+        playerPos: povPos,
+        playerHeading: povHeading,
+        arenaHalf: world.arenaHalf,
+      });
       const sizePx = player.id === "p1" ? 4 : 3;
       if (!player.alive) {
         ctx.strokeStyle = "rgba(255, 60, 60, 0.9)";

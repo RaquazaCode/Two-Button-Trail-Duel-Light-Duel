@@ -25,6 +25,8 @@ export const connectLightDuel = async (args: {
 
   return {
     sendInput: (input) => room.send("input", inputToMessage(input)),
-    leave: () => room.leave(),
+    leave: async () => {
+      await room.leave();
+    },
   };
 };

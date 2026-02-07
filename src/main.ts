@@ -187,7 +187,7 @@ if (app) {
     chaseCamera.update(next, dtMs / 1000);
     environment.update(dtMs);
     bikeRenderer.update(next.players, next.time);
-    trailRenderer.update(next.trails, next.players, next.time);
+    trailRenderer.update(next.trails);
     eliminationEffects.update(next.players, next.time);
     hud.update({
       time: next.time,
@@ -210,7 +210,7 @@ if (app) {
     });
   };
 
-  const getInputs = () => {
+  const getInputs = (): Record<string, -1 | 0 | 1> => {
     if (!world) return { p1: 0 };
     const inputs: Record<string, -1 | 0 | 1> = { p1: input };
     const player = world.players.find((p) => p.id === "p1");

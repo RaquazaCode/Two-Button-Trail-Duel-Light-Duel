@@ -51,3 +51,10 @@ TODO:
   - MEDIUM frame p95: 141.00ms @30s / 141.00ms @60s
   - HARD frame p95: 184.00ms @30s / 184.00ms @60s
   - NOTE: These perf values are not representative of local hardware gameplay because the run used software-rendered SwiftShader in headless mode due unavailable native WebGL context.
+- 2026-02-07: Live hotfix pass for reported gameplay regressions:
+  - Increased local sim pace to restore high-speed feel (`speed` doubled from 34 to 68, with higher turn rate for control).
+  - Fixed trail coloring drift by switching instanced trail material to unlit per-instance color rendering.
+  - Fixed invisible-trail collisions by replacing append-only trail instance tracking with trail-window synchronization that handles head-pruning and index shifts.
+  - Added difficulty-based trail persistence (`EASY: 45s`, `MEDIUM: 80s`, `HARD: 120s`) and wired runtime updates on difficulty selection/start.
+  - Minimap trail rendering now draws the full active trail set every update for accurate HUD parity.
+  - Added regression tests for trail difficulty persistence and trail renderer window-shift/color behavior.

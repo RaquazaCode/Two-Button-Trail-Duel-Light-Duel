@@ -109,7 +109,67 @@ test("trail renderer assigns expected owner color tint", () => {
   const mesh = getTrailMesh(scene);
   const color = new THREE.Color();
   mesh.getColorAt(0, color);
-  const expected = new THREE.Color(getPlayerColor("b1")).multiplyScalar(1.2);
+  const expected = new THREE.Color(getPlayerColor("b1"));
+  expect(Math.abs(color.r - expected.r)).toBeLessThan(0.0001);
+  expect(Math.abs(color.g - expected.g)).toBeLessThan(0.0001);
+  expect(Math.abs(color.b - expected.b)).toBeLessThan(0.0001);
+});
+
+test("trail renderer uses unlit material so per-instance owner colors stay distinct", () => {
+  const scene = new THREE.Scene();
+  createTrailRenderer(scene);
+  const mesh = getTrailMesh(scene);
+  expect(mesh.material).toBeInstanceOf(THREE.MeshBasicMaterial);
+  const material = mesh.material as THREE.MeshBasicMaterial;
+  expect(material.vertexColors).toBe(true);
+  expect(material.toneMapped).toBe(false);
+});
+
+test("trail renderer keeps sync when trail window shifts at constant length", () => {
+  const scene = new THREE.Scene();
+  const renderer = createTrailRenderer(scene);
+  renderer.update([
+    {
+      id: 1,
+      owner: "b1",
+      start: vec2(0, 0),
+      end: vec2(2, 0),
+      createdAt: 0,
+      solidAt: 0,
+    },
+    {
+      id: 2,
+      owner: "b1",
+      start: vec2(2, 0),
+      end: vec2(4, 0),
+      createdAt: 0.1,
+      solidAt: 0.1,
+    },
+  ]);
+
+  renderer.update([
+    {
+      id: 2,
+      owner: "b2",
+      start: vec2(2, 0),
+      end: vec2(4, 0),
+      createdAt: 0.1,
+      solidAt: 0.1,
+    },
+    {
+      id: 3,
+      owner: "b2",
+      start: vec2(4, 0),
+      end: vec2(6, 0),
+      createdAt: 0.2,
+      solidAt: 0.2,
+    },
+  ]);
+
+  const mesh = getTrailMesh(scene);
+  const color = new THREE.Color();
+  mesh.getColorAt(0, color);
+  const expected = new THREE.Color(getPlayerColor("b2"));
   expect(Math.abs(color.r - expected.r)).toBeLessThan(0.0001);
   expect(Math.abs(color.g - expected.g)).toBeLessThan(0.0001);
   expect(Math.abs(color.b - expected.b)).toBeLessThan(0.0001);

@@ -13,10 +13,10 @@ export const getDifficultyProfile = (difficulty: Difficulty): DifficultyProfile 
   if (difficulty === "HARD") {
     return {
       name: "HARD",
-      aggression: 0.78,
-      pressure: 0.82,
+      aggression: 0.7,
+      pressure: 0.72,
       reactionScale: 1.3,
-      riskTolerance: 0.38,
+      riskTolerance: 0.33,
       cooperationChance: 0.45,
     };
   }
@@ -24,10 +24,10 @@ export const getDifficultyProfile = (difficulty: Difficulty): DifficultyProfile 
   if (difficulty === "MEDIUM") {
     return {
       name: "MEDIUM",
-      aggression: 0.52,
-      pressure: 0.56,
+      aggression: 0.46,
+      pressure: 0.48,
       reactionScale: 1.08,
-      riskTolerance: 0.53,
+      riskTolerance: 0.5,
       cooperationChance: 0.18,
     };
   }

@@ -34,9 +34,7 @@ import { generateSpawnPoints } from "./game/spawn";
 import { createPerfTracker } from "./game/perf";
 import { formatDiagnostics, type DiagnosticsSnapshot } from "./game/diagnostics";
 import { createBotDecisionCache } from "./game/botDecisionCache";
-
-const BOT_COUNT = 8;
-const TOTAL_PLAYERS = BOT_COUNT + 1;
+import { TOTAL_PLAYERS } from "./game/playerContract";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
@@ -245,6 +243,8 @@ if (app) {
     }
     return renderGameToText(world);
   };
+
+  window.get_diagnostics_text = () => formatDiagnostics(buildDiagnosticsSnapshot());
 
   window.advanceTime = (ms: number) => {
     if (modeToUseServer(mode)) return;

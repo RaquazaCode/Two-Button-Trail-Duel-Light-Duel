@@ -13,31 +13,31 @@ export const getDifficultyProfile = (difficulty: Difficulty): DifficultyProfile 
   if (difficulty === "HARD") {
     return {
       name: "HARD",
-      aggression: 0.85,
-      pressure: 0.9,
-      reactionScale: 1.4,
-      riskTolerance: 0.35,
-      cooperationChance: 0.5,
+      aggression: 0.78,
+      pressure: 0.82,
+      reactionScale: 1.3,
+      riskTolerance: 0.38,
+      cooperationChance: 0.45,
     };
   }
 
   if (difficulty === "MEDIUM") {
     return {
       name: "MEDIUM",
-      aggression: 0.55,
-      pressure: 0.6,
-      reactionScale: 1.15,
-      riskTolerance: 0.5,
-      cooperationChance: 0.2,
+      aggression: 0.52,
+      pressure: 0.56,
+      reactionScale: 1.08,
+      riskTolerance: 0.53,
+      cooperationChance: 0.18,
     };
   }
 
   return {
     name: "EASY",
-    aggression: 0.35,
-    pressure: 0.4,
-    reactionScale: 1.0,
-    riskTolerance: 0.6,
+    aggression: 0.33,
+    pressure: 0.36,
+    reactionScale: 0.95,
+    riskTolerance: 0.62,
     cooperationChance: 0.0,
   };
 };

@@ -5,7 +5,7 @@ import { getPlayerColor } from "./palette";
 export const FLASH_DURATION = 0.12;
 export const BURST_DURATION = 0.8;
 export const SHOCK_DURATION = 0.25;
-export const ELIMINATION_SOUND_COOLDOWN = 2.8;
+export const ELIMINATION_SOUND_COOLDOWN = 3.4;
 
 export const shouldPlayEliminationSound = (
   lastPlayedAt: number | null,
@@ -71,33 +71,24 @@ const playEliminationSound = (ctx: AudioContext | null) => {
 
   const now = ctx.currentTime;
 
-  const burst = ctx.createOscillator();
-  const burstGain = ctx.createGain();
-  burst.type = "sawtooth";
-  burst.frequency.setValueAtTime(120, now);
-  burst.frequency.exponentialRampToValueAtTime(52, now + 0.28);
-  burstGain.gain.setValueAtTime(0.0001, now);
-  burstGain.gain.exponentialRampToValueAtTime(0.05, now + 0.04);
-  burstGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
-  const burstFilter = ctx.createBiquadFilter();
-  burstFilter.type = "lowpass";
-  burstFilter.frequency.setValueAtTime(1300, now);
-  burstFilter.frequency.exponentialRampToValueAtTime(420, now + 0.22);
-  burst.connect(burstFilter).connect(burstGain).connect(ctx.destination);
-  burst.start(now);
-  burst.stop(now + 0.26);
+  // Keep elimination audio as a single short pulse to avoid click-loop artifacts.
+  const pulse = ctx.createOscillator();
+  const pulseGain = ctx.createGain();
+  pulse.type = "triangle";
+  pulse.frequency.setValueAtTime(196, now);
+  pulse.frequency.exponentialRampToValueAtTime(110, now + 0.24);
+  pulseGain.gain.setValueAtTime(0.0001, now);
+  pulseGain.gain.exponentialRampToValueAtTime(0.032, now + 0.03);
+  pulseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.28);
 
-  const low = ctx.createOscillator();
-  const lowGain = ctx.createGain();
-  low.type = "sine";
-  low.frequency.setValueAtTime(72, now + 0.04);
-  low.frequency.exponentialRampToValueAtTime(36, now + 0.44);
-  lowGain.gain.setValueAtTime(0.0001, now + 0.04);
-  lowGain.gain.exponentialRampToValueAtTime(0.09, now + 0.12);
-  lowGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.48);
-  low.connect(lowGain).connect(ctx.destination);
-  low.start(now + 0.03);
-  low.stop(now + 0.5);
+  const filter = ctx.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.setValueAtTime(1800, now);
+  filter.frequency.exponentialRampToValueAtTime(600, now + 0.2);
+
+  pulse.connect(filter).connect(pulseGain).connect(ctx.destination);
+  pulse.start(now);
+  pulse.stop(now + 0.3);
 };
 
 const createEffect = (id: string, color: number, position: THREE.Vector3): Effect => {

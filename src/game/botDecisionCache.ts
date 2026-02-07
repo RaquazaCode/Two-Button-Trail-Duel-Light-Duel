@@ -10,15 +10,21 @@ type BotDecisionState = {
 };
 
 const DECISION_INTERVAL: Record<Difficulty, number> = {
-  EASY: 0.16,
-  MEDIUM: 0.13,
-  HARD: 0.1,
+  EASY: 0.19,
+  MEDIUM: 0.155,
+  HARD: 0.125,
 };
 
 const MAX_TURN_STREAK: Record<Difficulty, number> = {
-  EASY: 5,
-  MEDIUM: 7,
-  HARD: 8,
+  EASY: 4,
+  MEDIUM: 6,
+  HARD: 7,
+};
+
+const BREAKOUT_DURATION: Record<Difficulty, number> = {
+  EASY: 0.68,
+  MEDIUM: 0.58,
+  HARD: 0.52,
 };
 
 export const getDecisionInterval = (difficulty: Difficulty) => DECISION_INTERVAL[difficulty];
@@ -49,7 +55,7 @@ export const createBotDecisionCache = (
       // Break self-spirals by forcing a straight-line breakout window.
       nextInput = 0;
       nextStreak = 0;
-      breakoutUntil = time + 0.5;
+      breakoutUntil = time + BREAKOUT_DURATION[difficulty];
     }
 
     const jitter = 0.9 + rng() * 0.2;

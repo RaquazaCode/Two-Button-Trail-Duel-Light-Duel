@@ -6,6 +6,7 @@ test("formatDiagnostics includes key performance and system info", () => {
     perf: {
       fps: 60,
       frameMs: { avg: 16.6, p95: 21.2, max: 30.5 },
+      simMs: { avg: 5.8, max: 12.2 },
       updateMs: { avg: 3.2, max: 6.1 },
       renderMs: { avg: 5.1, max: 9.4 },
     },
@@ -44,6 +45,7 @@ test("formatDiagnostics includes key performance and system info", () => {
   });
 
   expect(text).toContain("FPS");
+  expect(text).toContain("Simulation");
   expect(text).toContain("TestAgent");
   expect(text).toContain("Draw Calls");
   expect(text).toContain("Last Match");

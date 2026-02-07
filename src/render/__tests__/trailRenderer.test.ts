@@ -5,7 +5,13 @@ import { getPlayerColor } from "../palette";
 import { CONFIG } from "../../sim/config";
 import { BIKE_HEIGHT } from "../bike";
 
-test("trail renderer colors segments per player and can reset", () => {
+const getTrailMesh = (scene: THREE.Scene) => {
+  const mesh = scene.children.find((child) => child instanceof THREE.InstancedMesh);
+  if (!mesh) throw new Error("Trail instanced mesh not found");
+  return mesh as THREE.InstancedMesh;
+};
+
+test("trail renderer appends instances and can reset", () => {
   const scene = new THREE.Scene();
   const renderer = createTrailRenderer(scene);
   renderer.update([
@@ -27,14 +33,16 @@ test("trail renderer colors segments per player and can reset", () => {
     },
   ]);
 
-  const meshes = scene.children.filter((child) => child instanceof THREE.Mesh) as THREE.Mesh[];
-  expect(meshes.length).toBe(2);
-  const colors = meshes.map((mesh) => (mesh.material as THREE.MeshStandardMaterial).color.getHex());
-  expect(colors).toContain(getPlayerColor("b1"));
-  expect(colors).toContain(getPlayerColor("b2"));
+  const mesh = getTrailMesh(scene);
+  expect(mesh.count).toBe(2);
+  const c0 = new THREE.Color();
+  const c1 = new THREE.Color();
+  mesh.getColorAt(0, c0);
+  mesh.getColorAt(1, c1);
+  expect(c0.getHex()).not.toBe(c1.getHex());
 
   renderer.reset();
-  expect(scene.children.length).toBe(0);
+  expect(mesh.count).toBe(0);
 });
 
 test("trail renderer splits long segments into visible pieces", () => {
@@ -51,11 +59,9 @@ test("trail renderer splits long segments into visible pieces", () => {
     },
   ]);
 
-  const meshes = scene.children.filter((child) => child instanceof THREE.Mesh) as THREE.Mesh[];
-  expect(meshes.length).toBeGreaterThan(0);
-  meshes.forEach((mesh) => {
-    expect(mesh.scale.x).toBeLessThanOrEqual(8);
-  });
+  const mesh = getTrailMesh(scene);
+  expect(mesh.count).toBeGreaterThan(1);
+  expect(mesh.count).toBeLessThanOrEqual(13);
 });
 
 test("trail renderer uses configured width and height", () => {
@@ -72,9 +78,39 @@ test("trail renderer uses configured width and height", () => {
     },
   ]);
 
-  const mesh = scene.children.find((child) => child instanceof THREE.Mesh) as THREE.Mesh;
+  const mesh = getTrailMesh(scene);
   const geometry = mesh.geometry as THREE.BoxGeometry;
-  expect(mesh.scale.x).toBeCloseTo(2);
   expect(geometry.parameters.depth).toBeCloseTo(CONFIG.trailWidth);
   expect(geometry.parameters.height).toBeCloseTo(BIKE_HEIGHT * 0.7);
+
+  const matrix = new THREE.Matrix4();
+  mesh.getMatrixAt(0, matrix);
+  const position = new THREE.Vector3();
+  const rotation = new THREE.Quaternion();
+  const scale = new THREE.Vector3();
+  matrix.decompose(position, rotation, scale);
+  expect(scale.x).toBeCloseTo(2);
+});
+
+test("trail renderer assigns expected owner color tint", () => {
+  const scene = new THREE.Scene();
+  const renderer = createTrailRenderer(scene);
+  renderer.update([
+    {
+      id: 5,
+      owner: "b1",
+      start: vec2(0, 0),
+      end: vec2(2, 0),
+      createdAt: 0,
+      solidAt: 0,
+    },
+  ]);
+
+  const mesh = getTrailMesh(scene);
+  const color = new THREE.Color();
+  mesh.getColorAt(0, color);
+  const expected = new THREE.Color(getPlayerColor("b1")).multiplyScalar(1.2);
+  expect(Math.abs(color.r - expected.r)).toBeLessThan(0.0001);
+  expect(Math.abs(color.g - expected.g)).toBeLessThan(0.0001);
+  expect(Math.abs(color.b - expected.b)).toBeLessThan(0.0001);
 });

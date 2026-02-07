@@ -8,10 +8,12 @@ export type LoopHandle = {
   stop: () => void;
 };
 
+const MAX_STEPS_PER_FRAME = 8;
+
 export const createGameLoop = (
   initial: WorldState,
   inputProvider: InputProvider,
-  onUpdate: (world: WorldState) => void
+  onUpdate: (world: WorldState, simMs: number) => void
 ): LoopHandle => {
   let world = initial;
   let last = performance.now();
@@ -25,12 +27,21 @@ export const createGameLoop = (
     last = now;
     accumulator += Math.min(frame, 0.25);
 
-    while (accumulator >= dt) {
+    const simStart = performance.now();
+    let steps = 0;
+    while (accumulator >= dt && steps < MAX_STEPS_PER_FRAME) {
       world = stepWorld(world, inputProvider(), dt);
       accumulator -= dt;
+      steps += 1;
     }
 
-    onUpdate(world);
+    if (steps === MAX_STEPS_PER_FRAME && accumulator >= dt) {
+      // Avoid spiral-of-death under load by dropping stale backlog.
+      accumulator = 0;
+    }
+
+    const simMs = performance.now() - simStart;
+    onUpdate(world, simMs);
     requestAnimationFrame(tick);
   };
 

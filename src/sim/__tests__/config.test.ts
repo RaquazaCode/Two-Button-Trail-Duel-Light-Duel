@@ -7,6 +7,7 @@ test("config uses balanced tuning preset", () => {
   expect(CONFIG.turnInertia).toBe(0.12);
   expect(CONFIG.gapOff).toBe(0);
   expect(CONFIG.selfTrailGrace).toBeCloseTo(0.35);
+  expect(CONFIG.openingGrace).toBe(8);
   expect(CONFIG.shrinkStart).toBe(50);
   expect(CONFIG.shrinkEnd).toBe(150);
   expect(CONFIG.shrinkTo).toBe(0.45);

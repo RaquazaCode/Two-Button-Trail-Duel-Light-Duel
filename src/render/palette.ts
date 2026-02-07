@@ -8,6 +8,7 @@ const BOT_COLORS = [
   0x9b00ff,
   0xff003c,
   0x007bff,
+  0xff4f9a,
 ];
 
 const extractIndex = (id: string) => {

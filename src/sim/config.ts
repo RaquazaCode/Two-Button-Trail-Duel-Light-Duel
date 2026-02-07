@@ -8,6 +8,7 @@ export const CONFIG = {
   gapOn: 2.0,
   gapOff: 0,
   selfTrailGrace: 0.35,
+  openingGrace: 8,
   shrinkStart: 50,
   shrinkEnd: 150,
   shrinkTo: 0.45,

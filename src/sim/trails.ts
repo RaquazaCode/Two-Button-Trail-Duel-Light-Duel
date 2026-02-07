@@ -10,14 +10,18 @@ export const updateTrail = (args: {
   solidifyDelay: number;
   state: { gapTimer: number; gapOnState: boolean; trailId: number };
   owner: string;
-  trails: TrailSegment[];
 }) => {
   const total = args.gapOn + args.gapOff;
   const mod = args.time % total;
   const gapOnState = mod < args.gapOn;
 
   if (!gapOnState) {
-    return { trails: args.trails, gapOnState, gapTimer: args.time };
+    return {
+      segments: [] as TrailSegment[],
+      gapOnState,
+      gapTimer: args.time,
+      trailId: args.state.trailId,
+    };
   }
 
   const dx = args.next.x - args.prev.x;
@@ -45,7 +49,7 @@ export const updateTrail = (args: {
       });
     }
     return {
-      trails: [...args.trails, ...segments],
+      segments,
       gapOnState,
       gapTimer: args.time,
       trailId: args.state.trailId + parts,
@@ -62,7 +66,7 @@ export const updateTrail = (args: {
   };
 
   return {
-    trails: [...args.trails, seg],
+    segments: [seg],
     gapOnState,
     gapTimer: args.time,
     trailId: seg.id,

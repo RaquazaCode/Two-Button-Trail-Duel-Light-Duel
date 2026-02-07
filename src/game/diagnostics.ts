@@ -1,6 +1,7 @@
 export type PerfStats = {
   fps: number;
   frameMs: { avg: number; p95: number; max: number };
+  simMs: { avg: number; max: number };
   updateMs: { avg: number; max: number };
   renderMs: { avg: number; max: number };
 };
@@ -62,6 +63,9 @@ export const formatDiagnostics = (snapshot: DiagnosticsSnapshot) => {
     `Frame: avg ${formatMs(snapshot.perf.frameMs.avg)} | p95 ${formatMs(
       snapshot.perf.frameMs.p95
     )} | max ${formatMs(snapshot.perf.frameMs.max)}`,
+    `Simulation: avg ${formatMs(snapshot.perf.simMs.avg)} | max ${formatMs(
+      snapshot.perf.simMs.max
+    )}`,
     `Update: avg ${formatMs(snapshot.perf.updateMs.avg)} | max ${formatMs(
       snapshot.perf.updateMs.max
     )}`,

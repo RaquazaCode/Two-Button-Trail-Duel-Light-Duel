@@ -89,10 +89,12 @@ const chooseOpenSectorAngle = (args: {
   trails: TrailSegment[];
   role: "HUNTER" | "ROAMER";
   difficulty: Difficulty;
+  reactionScale: number;
   playerPos?: Vec2;
   horizon: number;
 }) => {
-  const sampleAngles = args.difficulty === "HARD" ? 18 : 14;
+  const baseSamples = args.difficulty === "HARD" ? 16 : 12;
+  const sampleAngles = Math.max(10, Math.round(baseSamples * args.reactionScale));
   let bestScore = Number.NEGATIVE_INFINITY;
   let bestAngle = 0;
 
@@ -163,10 +165,11 @@ export const chooseBotInput = (args: {
   }
 
   const baseDt = 1 / CONFIG.simHz;
-  const stepStride = 4;
+  const stepStride = 5;
   const dt = baseDt * stepStride;
-  const lookaheadSeconds =
-    args.difficulty === "HARD" ? 0.44 : args.difficulty === "MEDIUM" ? 0.38 : 0.34;
+  const baseLookahead =
+    args.difficulty === "HARD" ? 0.34 : args.difficulty === "MEDIUM" ? 0.3 : 0.27;
+  const lookaheadSeconds = Math.max(0.22, baseLookahead * profile.reactionScale);
   const steps = Math.max(1, Math.ceil(lookaheadSeconds / dt));
   const horizonRadius = CONFIG.speed * (lookaheadSeconds + 2.2) + CONFIG.trailWidth * 8;
   const nearbyTrails = filterNearbyTrails(args.trails, args.pos, horizonRadius);
@@ -203,6 +206,7 @@ export const chooseBotInput = (args: {
     trails: nearbyTrails,
     role,
     difficulty: args.difficulty,
+    reactionScale: profile.reactionScale,
     playerPos: args.playerPos,
     horizon: Math.min(args.arenaHalf * 0.55, CONFIG.speed * 6.5),
   });

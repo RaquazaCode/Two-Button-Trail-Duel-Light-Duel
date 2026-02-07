@@ -76,10 +76,10 @@ We will define and use these types in `src/sim/`:
 - Create: `package.json`, `vite.config.ts`, `src/main.ts`, `src/style.css`, `index.html` (via Vite)
 - Modify: `package.json` scripts
 
-**Step 1:** Run `npm create vite@latest . -- --template vanilla-ts`
-**Step 2:** Run `npm install`
-**Step 3:** Run `npm install three`
-**Step 4:** Run `npm install -D vitest @types/three`
+**Step 1:** Run `pnpm dlx create-vite@latest . --template vanilla-ts`
+**Step 2:** Run `pnpm install`
+**Step 3:** Run `pnpm add three`
+**Step 4:** Run `pnpm add -D vitest @types/three`
 **Step 5:** Add `test` script to `package.json`: `"test": "vitest run"`
 **Step 6:** Commit
 `git add package.json vite.config.ts src/main.ts src/style.css index.html`
@@ -112,7 +112,7 @@ test("vec2 math works", () => {
 });
 ```
 
-**Step 2:** Run `npm test` and confirm FAIL (math module missing)
+**Step 2:** Run `pnpm test` and confirm FAIL (math module missing)
 **Step 3: Implement minimal code**
 ```ts
 // src/sim/math.ts
@@ -178,7 +178,7 @@ export type WorldState = {
 };
 ```
 
-**Step 4:** Run `npm test` and confirm PASS
+**Step 4:** Run `pnpm test` and confirm PASS
 **Step 5:** Commit
 `git add src/sim/config.ts src/sim/math.ts src/sim/types.ts src/sim/__tests__/math.test.ts`
 `git commit -m "feat: add sim config and math primitives"`
@@ -212,7 +212,7 @@ test("physics updates heading and position with turn inertia", () => {
 });
 ```
 
-**Step 2:** Run `npm test` and confirm FAIL
+**Step 2:** Run `pnpm test` and confirm FAIL
 **Step 3: Implement minimal code**
 ```ts
 // src/sim/physics.ts
@@ -242,7 +242,7 @@ export const stepPhysics = (p: PhysicsInput) => {
 };
 ```
 
-**Step 4:** Run `npm test` and confirm PASS
+**Step 4:** Run `pnpm test` and confirm PASS
 **Step 5:** Commit
 `git add src/sim/physics.ts src/sim/__tests__/physics.test.ts`
 `git commit -m "feat: add physics step with turn inertia"`
@@ -276,7 +276,7 @@ test("trail respects gap cadence", () => {
 });
 ```
 
-**Step 2:** Run `npm test` and confirm FAIL
+**Step 2:** Run `pnpm test` and confirm FAIL
 **Step 3: Implement minimal code**
 ```ts
 // src/sim/trails.ts
@@ -320,7 +320,7 @@ export const updateTrail = (args: {
 };
 ```
 
-**Step 4:** Run `npm test` and confirm PASS
+**Step 4:** Run `pnpm test` and confirm PASS
 **Step 5:** Commit
 `git add src/sim/trails.ts src/sim/__tests__/trails.test.ts`
 `git commit -m "feat: add trail segments with micro-gap cadence"`
@@ -352,7 +352,7 @@ test("bounds detect out of arena", () => {
 });
 ```
 
-**Step 2:** Run `npm test` and confirm FAIL
+**Step 2:** Run `pnpm test` and confirm FAIL
 **Step 3: Implement minimal code**
 ```ts
 // src/sim/collision.ts
@@ -386,7 +386,7 @@ export const outOfBounds = (pos: Vec2, arenaHalf: number) =>
   Math.abs(pos.x) > arenaHalf || Math.abs(pos.y) > arenaHalf;
 ```
 
-**Step 4:** Run `npm test` and confirm PASS
+**Step 4:** Run `pnpm test` and confirm PASS
 **Step 5:** Commit
 `git add src/sim/collision.ts src/sim/__tests__/collision.test.ts`
 `git commit -m "feat: add collision detection for trails and bounds"`
@@ -414,7 +414,7 @@ test("player marked eliminated on collision", () => {
 });
 ```
 
-**Step 2:** Run `npm test` and confirm FAIL
+**Step 2:** Run `pnpm test` and confirm FAIL
 **Step 3: Implement minimal code**
 ```ts
 // src/sim/match.ts
@@ -426,7 +426,7 @@ export const resolveElimination = (args: { player: PlayerState; hit: boolean; ti
 };
 ```
 
-**Step 4:** Run `npm test` and confirm PASS
+**Step 4:** Run `pnpm test` and confirm PASS
 **Step 5:** Commit
 `git add src/sim/match.ts src/sim/__tests__/match.test.ts`
 `git commit -m "feat: add elimination resolution"`
@@ -452,7 +452,7 @@ test("arena shrinks over time", () => {
 });
 ```
 
-**Step 2:** Run `npm test` and confirm FAIL
+**Step 2:** Run `pnpm test` and confirm FAIL
 **Step 3: Implement minimal code**
 ```ts
 // src/sim/shrink.ts
@@ -470,7 +470,7 @@ export const arenaHalfAt = (
 };
 ```
 
-**Step 4:** Run `npm test` and confirm PASS
+**Step 4:** Run `pnpm test` and confirm PASS
 **Step 5:** Commit
 `git add src/sim/shrink.ts src/sim/__tests__/shrink.test.ts`
 `git commit -m "feat: add arena shrink schedule"`
@@ -498,7 +498,7 @@ test("bot chooses a safe direction", () => {
 });
 ```
 
-**Step 2:** Run `npm test` and confirm FAIL
+**Step 2:** Run `pnpm test` and confirm FAIL
 **Step 3: Implement minimal code**
 ```ts
 // src/sim/bot.ts
@@ -518,7 +518,7 @@ export const chooseBotInput = (args: {
 };
 ```
 
-**Step 4:** Run `npm test` and confirm PASS
+**Step 4:** Run `pnpm test` and confirm PASS
 **Step 5:** Commit
 `git add src/sim/bot.ts src/sim/__tests__/bot.test.ts`
 `git commit -m "feat: add deterministic bot steering heuristic"`
@@ -550,7 +550,7 @@ test("stepWorld advances time", () => {
 });
 ```
 
-**Step 2:** Run `npm test` and confirm FAIL
+**Step 2:** Run `pnpm test` and confirm FAIL
 **Step 3: Implement minimal code**
 ```ts
 // src/sim/step.ts
@@ -586,7 +586,7 @@ export const stepWorld = (world: any, inputs: Record<string, -1|0|1>, dt: number
 };
 ```
 
-**Step 4:** Run `npm test` and confirm PASS
+**Step 4:** Run `pnpm test` and confirm PASS
 **Step 5:** Commit
 `git add src/game/loop.ts src/sim/step.ts src/sim/__tests__/step.test.ts src/main.ts`
 `git commit -m "feat: add fixed-step world update with inputs"`
@@ -601,7 +601,7 @@ export const stepWorld = (world: any, inputs: Record<string, -1|0|1>, dt: number
 
 **Step 1:** Implement scene creation with camera, renderer, grid, lights
 **Step 2:** Add bloom composer with `UnrealBloomPass`
-**Step 3:** Manual verify: `npm run dev` and confirm neon grid renders
+**Step 3:** Manual verify: `pnpm dev` and confirm neon grid renders
 **Step 4:** Commit
 `git add src/render/scene.ts src/render/bloom.ts src/main.ts`
 `git commit -m "feat: add Three.js scene and bloom"`
@@ -711,8 +711,8 @@ export const stepWorld = (world: any, inputs: Record<string, -1|0|1>, dt: number
 
 ## Acceptance Criteria
 
-- `npm test` passes after each sim task
-- `npm run dev` shows playable solo loop with 1 player + 7 bots
+- `pnpm test` passes after each sim task
+- `pnpm dev` shows playable solo loop with 1 player + 7 bots
 - Trails draw with micro-gaps and collisions eliminate immediately
 - Arena shrinks on schedule
 - Bloom makes neon visuals readable without heavy performance hit

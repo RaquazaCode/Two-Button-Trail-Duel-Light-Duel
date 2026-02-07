@@ -33,3 +33,22 @@ test("generateSpawnPoints preserves spacing even when attempts are limited", () 
   expect(spawns).toHaveLength(8);
   expect(minPairDistance(spawns)).toBeGreaterThanOrEqual(192);
 });
+
+test("spawn headings avoid immediate outward wall direction", () => {
+  const spawns = generateSpawnPoints({
+    count: 8,
+    arenaHalf: 437.5,
+    minDistance: 220,
+    margin: 96,
+    rng: makeRng(1337),
+    maxAttempts: 100,
+  });
+
+  spawns.forEach((spawn) => {
+    const radial = Math.atan2(spawn.pos.y, spawn.pos.x);
+    const outward = Math.abs(
+      Math.atan2(Math.sin(spawn.heading - radial), Math.cos(spawn.heading - radial))
+    );
+    expect(outward).toBeGreaterThan(Math.PI / 6);
+  });
+});

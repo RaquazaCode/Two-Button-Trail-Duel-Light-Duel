@@ -1,5 +1,6 @@
 export type PerfSample = {
   frameMs: number;
+  simMs?: number;
   updateMs: number;
   renderMs: number;
   players: number;
@@ -9,6 +10,7 @@ export type PerfSample = {
 export type PerfSnapshot = {
   fps: number;
   frameMs: { avg: number; p95: number; max: number };
+  simMs: { avg: number; max: number };
   updateMs: { avg: number; max: number };
   renderMs: { avg: number; max: number };
   players: number;
@@ -37,9 +39,11 @@ export const createPerfTracker = (maxSamples = 180) => {
 
   const snapshot = (): PerfSnapshot => {
     const frame = samples.map((s) => s.frameMs);
+    const sim = samples.map((s) => s.simMs ?? 0);
     const update = samples.map((s) => s.updateMs);
     const render = samples.map((s) => s.renderMs);
     const avgFrame = average(frame);
+    const avgSim = average(sim);
     const avgUpdate = average(update);
     const avgRender = average(render);
 
@@ -49,6 +53,10 @@ export const createPerfTracker = (maxSamples = 180) => {
         avg: avgFrame,
         p95: percentile(frame, 0.95),
         max: frame.length ? Math.max(...frame) : 0,
+      },
+      simMs: {
+        avg: avgSim,
+        max: sim.length ? Math.max(...sim) : 0,
       },
       updateMs: {
         avg: avgUpdate,

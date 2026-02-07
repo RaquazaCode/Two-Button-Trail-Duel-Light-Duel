@@ -33,17 +33,22 @@ import { snapshotToWorld } from "./net/snapshot";
 import { generateSpawnPoints } from "./game/spawn";
 import { createPerfTracker } from "./game/perf";
 import { formatDiagnostics, type DiagnosticsSnapshot } from "./game/diagnostics";
+import { createBotDecisionCache } from "./game/botDecisionCache";
+import { TOTAL_PLAYERS } from "./game/playerContract";
 
 const app = document.querySelector<HTMLDivElement>("#app");
 
 const createPlayers = (): PlayerState[] => {
-  const total = 8;
   const spawns = generateSpawnPoints({
-    count: total,
+    count: TOTAL_PLAYERS,
     arenaHalf: CONFIG.arenaSize / 2,
-    minDistance: CONFIG.speed * 5,
-    margin: CONFIG.speed * 2,
+    minDistance: CONFIG.speed * 3.5,
+    margin: CONFIG.speed * 3,
   });
+
+  if (spawns.length !== TOTAL_PLAYERS) {
+    throw new Error(`Spawn generation failed: expected ${TOTAL_PLAYERS}, got ${spawns.length}`);
+  }
 
   return spawns.map((spawn, index) => ({
     id: index === 0 ? "p1" : `b${index}`,
@@ -108,6 +113,7 @@ if (app) {
   let mode: ModeOption = CONFIG.useServer ? "ONLINE" : "LOCAL";
   let difficulty: DifficultyOption = "EASY";
   let botRoles = new Map<string, BotRole>();
+  let botDecisionCache = createBotDecisionCache(difficulty);
   let connectionStatus: ConnectionStatus = "DISCONNECTED";
   let lastFrame = performance.now();
   let menu: ReturnType<typeof createMenu>;
@@ -122,6 +128,7 @@ if (app) {
       perf: {
         fps: perf.fps,
         frameMs: perf.frameMs,
+        simMs: perf.simMs,
         updateMs: perf.updateMs,
         renderMs: perf.renderMs,
       },
@@ -173,7 +180,7 @@ if (app) {
     getText: () => formatDiagnostics(buildDiagnosticsSnapshot()),
   });
 
-  const applyWorld = (next: WorldState) => {
+  const applyWorld = (next: WorldState, simMs = 0) => {
     const frameStart = performance.now();
     const dtMs = Math.max(1, frameStart - lastFrame);
     lastFrame = frameStart;
@@ -195,6 +202,7 @@ if (app) {
     const frameEnd = performance.now();
     perfTracker.record({
       frameMs: dtMs,
+      simMs,
       updateMs: renderStart - frameStart,
       renderMs: frameEnd - renderStart,
       players: next.players.length,
@@ -206,22 +214,26 @@ if (app) {
     if (!world) return { p1: 0 };
     const inputs: Record<string, -1 | 0 | 1> = { p1: input };
     const player = world.players.find((p) => p.id === "p1");
+
     world.players
       .filter((p) => p.id !== "p1")
       .forEach((bot) => {
-        inputs[bot.id] = chooseBotInput({
-          id: bot.id,
-          pos: bot.pos,
-          heading: bot.heading,
-          turnVel: bot.turnVel,
-          arenaHalf: world!.arenaHalf,
-          trails: world!.trails,
-          time: world!.time,
-          playerPos: player?.pos,
-          difficulty,
-          role: botRoles.get(bot.id),
-        });
+        inputs[bot.id] = botDecisionCache.get(bot.id, world!.time, () =>
+          chooseBotInput({
+            id: bot.id,
+            pos: bot.pos,
+            heading: bot.heading,
+            turnVel: bot.turnVel,
+            arenaHalf: world!.arenaHalf,
+            trails: world!.trails,
+            time: world!.time,
+            playerPos: player?.pos,
+            difficulty,
+            role: botRoles.get(bot.id),
+          })
+        );
       });
+
     return inputs;
   };
 
@@ -231,6 +243,8 @@ if (app) {
     }
     return renderGameToText(world);
   };
+
+  window.get_diagnostics_text = () => formatDiagnostics(buildDiagnosticsSnapshot());
 
   window.advanceTime = (ms: number) => {
     if (modeToUseServer(mode)) return;
@@ -315,6 +329,7 @@ if (app) {
     eliminationEffects.reset();
 
     input = 0;
+    botDecisionCache = createBotDecisionCache(difficulty);
     bindInputHandlers();
 
     if (modeToUseServer(mode)) {
@@ -364,9 +379,9 @@ if (app) {
       difficulty
     );
 
-    loop = createGameLoop(world, getInputs, (next) => {
+    loop = createGameLoop(world, getInputs, (next, simMs) => {
       world = next;
-      applyWorld(next);
+      applyWorld(next, simMs);
       finishMatch(next);
     });
   };

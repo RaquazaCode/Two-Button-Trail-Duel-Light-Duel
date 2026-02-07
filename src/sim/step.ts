@@ -158,10 +158,26 @@ export const stepWorld = (
     });
   });
 
-  const nextWorld = { ...world, time, arenaHalf, players, trails };
+  let activeTrails = trails;
+  let activeBuckets = trailBuckets;
+  if (CONFIG.trailLifetime > 0) {
+    const cutoff = time - CONFIG.trailLifetime;
+    if (cutoff > 0) {
+      const filtered = trails.filter((trail) => trail.createdAt >= cutoff);
+      if (filtered.length !== trails.length) {
+        activeTrails = filtered;
+        activeBuckets = new Map<string, TrailSegment[]>();
+        for (const trail of activeTrails) {
+          addTrailToBuckets(activeBuckets, trail);
+        }
+      }
+    }
+  }
+
+  const nextWorld = { ...world, time, arenaHalf, players, trails: activeTrails };
   trailCache.set(nextWorld, {
-    buckets: trailBuckets,
-    indexedTrailCount: trails.length,
+    buckets: activeBuckets,
+    indexedTrailCount: activeTrails.length,
   });
   return nextWorld;
 };

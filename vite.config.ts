@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { configDefaults, defineConfig } from "vitest/config";
 
 export default defineConfig({
   server: {
@@ -6,5 +6,6 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    exclude: [...configDefaults.exclude, ".worktrees/**"],
   },
 });

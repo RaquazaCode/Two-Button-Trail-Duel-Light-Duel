@@ -45,8 +45,14 @@ export const createMinimap = (container: HTMLElement) => {
     ctx.clearRect(0, 0, size, size);
   };
 
+  const trailColorCache = new Map<string, string>();
+  let lastUpdateAt = 0;
+
   const update = (world?: WorldState | null) => {
     if (!ctx) return;
+    const now = performance.now();
+    if (world && now - lastUpdateAt < 90) return;
+    lastUpdateAt = now;
     clear();
     if (!world) return;
 
@@ -63,15 +69,23 @@ export const createMinimap = (container: HTMLElement) => {
     ctx.clip();
 
     ctx.lineWidth = 1.5;
-    world.trails.forEach((trail) => {
+    const maxTrailDraw = 420;
+    const step = Math.max(1, Math.ceil(world.trails.length / maxTrailDraw));
+    for (let i = 0; i < world.trails.length; i += step) {
+      const trail = world.trails[i];
       const start = worldToMinimap(trail.start, world.arenaHalf);
       const end = worldToMinimap(trail.end, world.arenaHalf);
-      ctx.strokeStyle = colorToRgba(getPlayerColor(trail.owner), 0.85);
+      let stroke = trailColorCache.get(trail.owner);
+      if (!stroke) {
+        stroke = colorToRgba(getPlayerColor(trail.owner), 0.85);
+        trailColorCache.set(trail.owner, stroke);
+      }
+      ctx.strokeStyle = stroke;
       ctx.beginPath();
       ctx.moveTo(start.x * radius, -start.y * radius);
       ctx.lineTo(end.x * radius, -end.y * radius);
       ctx.stroke();
-    });
+    }
 
     world.players.forEach((player) => {
       const point = worldToMinimap(player.pos, world.arenaHalf);

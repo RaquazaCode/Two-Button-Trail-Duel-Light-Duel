@@ -39,3 +39,15 @@ TODO:
 - 2026-02-05: Spawn algorithm upgraded (best-candidate spacing + fallback ring) to ensure all 8 bots spawn with minimum spacing; roamers now avoid aiming directly at player.
 - 2026-02-05: Elimination audio gated with cooldown to prevent rapid clicking.
 - 2026-02-05: Playwright autostart captures in output/web-game-diagnostics-2 (shots 0-1). Vitest run with --pool=threads --maxWorkers=1 for new tests.
+- 2026-02-07: Created feature branch `codex/light-duel-tuning` and committed baseline WIP snapshot (`8b6a846`) before additional implementation.
+- 2026-02-07: Migrated active progress tracking to `games/2026-02-07-light-duel-tuning/progress.md`; added daily-run diagnostics artifact at `games/2026-02-07-light-duel-tuning/diagnostics-2026-02-07.md`.
+- 2026-02-07: Enforced pnpm workflow by generating `pnpm-lock.yaml`, removing `package-lock.json`, and normalizing npm command references in `docs/plans/2026-02-04-light-duel-implementation-plan.md`.
+- 2026-02-07: Updated Vitest discovery to exclude `.worktrees/**` while retaining default excludes.
+- 2026-02-07: Locked participant contract to 8 total (`1 human + 7 bots`) via `src/game/playerContract.ts` and wired main/test code to use shared constants.
+- 2026-02-07: Added trail lifetime pruning (`trailLifetime: 10`) in sim loop, tuned bot cadence/weights, and tightened elimination audio behavior to discrete debounced pulses.
+- 2026-02-07: Strengthened deterministic bot behavior quality checks to enforce 10s/30s survival thresholds across EASY/MEDIUM/HARD.
+- 2026-02-07: Automated diagnostics capture run completed under headless Chromium SwiftShader fallback.
+  - EASY frame p95: 145.10ms @30s / 145.10ms @60s
+  - MEDIUM frame p95: 141.00ms @30s / 141.00ms @60s
+  - HARD frame p95: 184.00ms @30s / 184.00ms @60s
+  - NOTE: These perf values are not representative of local hardware gameplay because the run used software-rendered SwiftShader in headless mode due unavailable native WebGL context.

@@ -5,6 +5,7 @@ import { generateSpawnPoints } from "../../game/spawn";
 import { vec2 } from "../math";
 import { stepWorld } from "../step";
 import { createBotDecisionCache } from "../../game/botDecisionCache";
+import { TOTAL_PLAYERS } from "../../game/playerContract";
 
 const createRng = (seed: number) => {
   let state = seed >>> 0;
@@ -14,14 +15,17 @@ const createRng = (seed: number) => {
   };
 };
 
-const runRound = (difficulty: "EASY" | "MEDIUM" | "HARD", seconds: number) => {
+const runCheckpoints = (
+  difficulty: "EASY" | "MEDIUM" | "HARD",
+  checkpoints: readonly number[]
+) => {
   const spawnRng = createRng(42);
   const roleRng = createRng(84);
   const decisionRng = createRng(126);
   const botRng = createRng(168);
 
   const spawns = generateSpawnPoints({
-    count: 9,
+    count: TOTAL_PLAYERS,
     arenaHalf: CONFIG.arenaSize / 2,
     minDistance: CONFIG.speed * 5,
     margin: CONFIG.speed * 2,
@@ -52,8 +56,11 @@ const runRound = (difficulty: "EASY" | "MEDIUM" | "HARD", seconds: number) => {
   );
   const cache = createBotDecisionCache(difficulty, decisionRng);
 
+  const sorted = [...checkpoints].sort((a, b) => a - b);
+  const aliveByTime = new Map<number, number>();
+
   const dt = 1 / CONFIG.simHz;
-  while (world.time < seconds) {
+  while (world.time < sorted[sorted.length - 1]) {
     const p1 = world.players.find((p) => p.id === "p1");
     const inputs: Record<string, -1 | 0 | 1> = { p1: 0 };
     for (const bot of world.players.filter((p) => p.id !== "p1")) {
@@ -74,19 +81,33 @@ const runRound = (difficulty: "EASY" | "MEDIUM" | "HARD", seconds: number) => {
       );
     }
     world = stepWorld(world, inputs, dt);
+
+    while (
+      aliveByTime.size < sorted.length &&
+      world.time >= sorted[aliveByTime.size]
+    ) {
+      const checkpoint = sorted[aliveByTime.size];
+      aliveByTime.set(checkpoint, world.players.filter((p) => p.alive).length);
+    }
   }
 
-  return world.players.filter((p) => p.alive).length;
+  return aliveByTime;
 };
 
-test("easy mode avoids early full collapse", () => {
-  expect(runRound("EASY", 10)).toBeGreaterThanOrEqual(3);
+test("easy mode keeps multiple riders alive through 30s", () => {
+  const alive = runCheckpoints("EASY", [10, 30]);
+  expect(alive.get(10)).toBeGreaterThanOrEqual(4);
+  expect(alive.get(30)).toBeGreaterThanOrEqual(2);
 });
 
-test("medium mode remains competitive beyond early game", () => {
-  expect(runRound("MEDIUM", 10)).toBeGreaterThanOrEqual(3);
+test("medium mode stays competitive through 30s", () => {
+  const alive = runCheckpoints("MEDIUM", [10, 30]);
+  expect(alive.get(10)).toBeGreaterThanOrEqual(4);
+  expect(alive.get(30)).toBeGreaterThanOrEqual(2);
 });
 
-test("hard mode avoids immediate full collapse", () => {
-  expect(runRound("HARD", 10)).toBeGreaterThanOrEqual(3);
+test("hard mode preserves pressure without total collapse by 30s", () => {
+  const alive = runCheckpoints("HARD", [10, 30]);
+  expect(alive.get(10)).toBeGreaterThanOrEqual(5);
+  expect(alive.get(30)).toBeGreaterThanOrEqual(2);
 });

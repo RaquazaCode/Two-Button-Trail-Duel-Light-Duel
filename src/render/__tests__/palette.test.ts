@@ -5,7 +5,7 @@ test("getPlayerColor returns cyan for player one", () => {
 });
 
 test("getPlayerColor assigns distinct spectrum colors for bots", () => {
-  const bots = ["b1", "b2", "b3", "b4", "b5", "b6", "b7"];
+  const bots = ["b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"];
   const colors = bots.map((id) => getPlayerColor(id));
   expect(new Set(colors).size).toBe(colors.length);
 });

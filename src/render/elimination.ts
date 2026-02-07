@@ -5,7 +5,7 @@ import { getPlayerColor } from "./palette";
 export const FLASH_DURATION = 0.12;
 export const BURST_DURATION = 0.8;
 export const SHOCK_DURATION = 0.25;
-const SOUND_COOLDOWN = 0.15;
+export const ELIMINATION_SOUND_COOLDOWN = 2.8;
 
 export const shouldPlayEliminationSound = (
   lastPlayedAt: number | null,
@@ -14,6 +14,14 @@ export const shouldPlayEliminationSound = (
 ) => {
   if (lastPlayedAt == null) return true;
   return now - lastPlayedAt >= cooldown;
+};
+
+export const shouldCreateEliminationEffect = (
+  lastHandledAt: number | undefined,
+  eliminatedAt: number | undefined
+) => {
+  if (eliminatedAt == null) return false;
+  return lastHandledAt !== eliminatedAt;
 };
 
 export const getFlashIntensity = (elapsed: number) => {
@@ -62,29 +70,34 @@ const playEliminationSound = (ctx: AudioContext | null) => {
   }
 
   const now = ctx.currentTime;
-  const crack = ctx.createOscillator();
-  const crackGain = ctx.createGain();
-  crack.type = "sawtooth";
-  crack.frequency.setValueAtTime(820, now);
-  crack.frequency.exponentialRampToValueAtTime(320, now + 0.08);
-  crackGain.gain.setValueAtTime(0.0001, now);
-  crackGain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
-  crackGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
-  crack.connect(crackGain).connect(ctx.destination);
-  crack.start(now);
-  crack.stop(now + 0.12);
 
-  const thump = ctx.createOscillator();
-  const thumpGain = ctx.createGain();
-  thump.type = "triangle";
-  thump.frequency.setValueAtTime(120, now + 0.05);
-  thump.frequency.exponentialRampToValueAtTime(60, now + 0.25);
-  thumpGain.gain.setValueAtTime(0.0001, now + 0.05);
-  thumpGain.gain.exponentialRampToValueAtTime(0.2, now + 0.1);
-  thumpGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-  thump.connect(thumpGain).connect(ctx.destination);
-  thump.start(now + 0.05);
-  thump.stop(now + 0.32);
+  const burst = ctx.createOscillator();
+  const burstGain = ctx.createGain();
+  burst.type = "sawtooth";
+  burst.frequency.setValueAtTime(120, now);
+  burst.frequency.exponentialRampToValueAtTime(52, now + 0.28);
+  burstGain.gain.setValueAtTime(0.0001, now);
+  burstGain.gain.exponentialRampToValueAtTime(0.05, now + 0.04);
+  burstGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+  const burstFilter = ctx.createBiquadFilter();
+  burstFilter.type = "lowpass";
+  burstFilter.frequency.setValueAtTime(1300, now);
+  burstFilter.frequency.exponentialRampToValueAtTime(420, now + 0.22);
+  burst.connect(burstFilter).connect(burstGain).connect(ctx.destination);
+  burst.start(now);
+  burst.stop(now + 0.26);
+
+  const low = ctx.createOscillator();
+  const lowGain = ctx.createGain();
+  low.type = "sine";
+  low.frequency.setValueAtTime(72, now + 0.04);
+  low.frequency.exponentialRampToValueAtTime(36, now + 0.44);
+  lowGain.gain.setValueAtTime(0.0001, now + 0.04);
+  lowGain.gain.exponentialRampToValueAtTime(0.09, now + 0.12);
+  lowGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.48);
+  low.connect(lowGain).connect(ctx.destination);
+  low.start(now + 0.03);
+  low.stop(now + 0.5);
 };
 
 const createEffect = (id: string, color: number, position: THREE.Vector3): Effect => {
@@ -163,22 +176,27 @@ const createEffect = (id: string, color: number, position: THREE.Vector3): Effec
 
 export const createEliminationEffects = (scene: THREE.Scene) => {
   const effects = new Map<string, Effect>();
+  const handledEliminations = new Map<string, number>();
   const audioContext = createAudio();
   let lastSoundAt: number | null = null;
 
   const update = (players: PlayerState[], time: number) => {
     players.forEach((player) => {
-      if (player.eliminatedAt == null) return;
+      if (!shouldCreateEliminationEffect(handledEliminations.get(player.id), player.eliminatedAt)) {
+        return;
+      }
       if (effects.has(player.id)) return;
+
       const effect = createEffect(
         player.id,
         getPlayerColor(player.id),
         new THREE.Vector3(player.pos.x, 0.2, player.pos.y)
       );
-      effect.startTime = player.eliminatedAt;
+      effect.startTime = player.eliminatedAt as number;
       effects.set(player.id, effect);
+      handledEliminations.set(player.id, player.eliminatedAt as number);
       scene.add(effect.group);
-      if (shouldPlayEliminationSound(lastSoundAt, time, SOUND_COOLDOWN)) {
+      if (shouldPlayEliminationSound(lastSoundAt, time, ELIMINATION_SOUND_COOLDOWN)) {
         playEliminationSound(audioContext);
         lastSoundAt = time;
       }
@@ -228,6 +246,8 @@ export const createEliminationEffects = (scene: THREE.Scene) => {
   const reset = () => {
     effects.forEach((effect) => scene.remove(effect.group));
     effects.clear();
+    handledEliminations.clear();
+    lastSoundAt = null;
   };
 
   return { update, reset };

@@ -2,7 +2,6 @@ import * as THREE from "three";
 import { createReflectiveFloor } from "./floor";
 import { createGridOverlay } from "./grid";
 import { computeEnvironmentLayout } from "./environmentLayout";
-import { createStaticEnvMap } from "./envMap";
 import { createSkyline } from "./skyline";
 import { STADIUM_SETTINGS } from "./stadiumConfig";
 

@@ -47,10 +47,10 @@ type Effect = {
   id: string;
   startTime: number;
   group: THREE.Group;
-  core: THREE.Mesh;
-  glow: THREE.Mesh;
-  ring: THREE.Mesh;
-  shards: THREE.InstancedMesh;
+  core: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
+  glow: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
+  ring: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>;
+  shards: THREE.InstancedMesh<THREE.BoxGeometry, THREE.MeshBasicMaterial>;
   shardData: Shard[];
   basePos: THREE.Vector3;
 };
@@ -211,7 +211,7 @@ export const createEliminationEffects = (scene: THREE.Scene) => {
         const scale = getShockScale(elapsed);
         effect.ring.visible = true;
         effect.ring.scale.set(scale, scale, scale);
-        (effect.ring.material as THREE.MeshBasicMaterial).opacity = 1 - elapsed / SHOCK_DURATION;
+        effect.ring.material.opacity = 1 - elapsed / SHOCK_DURATION;
       } else {
         effect.ring.visible = false;
       }
@@ -230,7 +230,7 @@ export const createEliminationEffects = (scene: THREE.Scene) => {
         effect.shards.setMatrixAt(index, matrix);
       });
       effect.shards.instanceMatrix.needsUpdate = true;
-      (effect.shards.material as THREE.MeshBasicMaterial).opacity = 1 - burstT;
+      effect.shards.material.opacity = 1 - burstT;
     });
   };
 

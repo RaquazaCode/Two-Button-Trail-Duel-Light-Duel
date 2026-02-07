@@ -42,6 +42,7 @@ export const createPerfTracker = (maxSamples = 180) => {
     const sim = samples.map((s) => s.simMs ?? 0);
     const update = samples.map((s) => s.updateMs);
     const render = samples.map((s) => s.renderMs);
+    const lastSample = samples.length > 0 ? samples[samples.length - 1] : undefined;
     const avgFrame = average(frame);
     const avgSim = average(sim);
     const avgUpdate = average(update);
@@ -66,8 +67,8 @@ export const createPerfTracker = (maxSamples = 180) => {
         avg: avgRender,
         max: render.length ? Math.max(...render) : 0,
       },
-      players: samples.at(-1)?.players ?? 0,
-      trails: samples.at(-1)?.trails ?? 0,
+      players: lastSample?.players ?? 0,
+      trails: lastSample?.trails ?? 0,
     };
   };
 

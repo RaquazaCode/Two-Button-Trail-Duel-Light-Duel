@@ -3,7 +3,7 @@ import { CONFIG } from "../config";
 test("config uses balanced tuning preset", () => {
   expect(CONFIG.arenaSize).toBe(1800);
   expect(CONFIG.speed).toBe(68);
-  expect(CONFIG.turnRate).toBe(8.8);
+  expect(CONFIG.turnRate).toBe(8.6);
   expect(CONFIG.turnInertia).toBe(0.12);
   expect(CONFIG.trailLifetime).toBe(45);
   expect(CONFIG.gapOff).toBe(0);

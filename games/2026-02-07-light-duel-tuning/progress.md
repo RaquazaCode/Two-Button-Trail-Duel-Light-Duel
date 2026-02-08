@@ -58,3 +58,9 @@ TODO:
   - Added difficulty-based trail persistence (`EASY: 45s`, `MEDIUM: 80s`, `HARD: 120s`) and wired runtime updates on difficulty selection/start.
   - Minimap trail rendering now draws the full active trail set every update for accurate HUD parity.
   - Added regression tests for trail difficulty persistence and trail renderer window-shift/color behavior.
+- 2026-02-08: Hotfix pass for live Vercel regression reports.
+  - Removed temporary debug instrumentation from `src/main.ts` and `src/render/trails.ts`.
+  - Finalized trail visibility fix by increasing arena trail ribbon height (`BIKE_HEIGHT * 1.35`) and disabling fog influence on trail material while preserving per-instance neon color mapping.
+  - Reduced steering snap and camera tilt slightly (`turnRate: 8.6`, `rollFactor: 0.03`, `rollMax: 0.018`).
+  - Verification: `pnpm test` (49 files / 92 tests passed), `pnpm build` passed.
+  - Visual verification artifacts: `games/2026-02-07-light-duel-tuning/output/playwright/trail-fix-verify/shot-0.png` + `state-0.json`.

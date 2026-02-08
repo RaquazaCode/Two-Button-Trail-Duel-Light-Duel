@@ -81,7 +81,7 @@ test("trail renderer uses configured width and height", () => {
   const mesh = getTrailMesh(scene);
   const geometry = mesh.geometry as THREE.BoxGeometry;
   expect(geometry.parameters.depth).toBeCloseTo(CONFIG.trailWidth);
-  expect(geometry.parameters.height).toBeCloseTo(BIKE_HEIGHT * 0.7);
+  expect(geometry.parameters.height).toBeCloseTo(BIKE_HEIGHT * 1.35);
 
   const matrix = new THREE.Matrix4();
   mesh.getMatrixAt(0, matrix);
@@ -123,6 +123,7 @@ test("trail renderer uses unlit material so per-instance owner colors stay disti
   const material = mesh.material as THREE.MeshBasicMaterial;
   expect(material.vertexColors).toBe(true);
   expect(material.toneMapped).toBe(false);
+  expect(material.fog).toBe(false);
 });
 
 test("trail renderer keeps sync when trail window shifts at constant length", () => {

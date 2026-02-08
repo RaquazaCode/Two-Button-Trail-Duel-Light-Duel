@@ -6,9 +6,10 @@ import { BIKE_HEIGHT } from "./bike";
 
 const MAX_TRAIL_INSTANCES = 90000;
 const MAX_SEGMENT_LENGTH = 8;
+const TRAIL_HEIGHT_SCALE = 1.35;
 
 export const createTrailRenderer = (scene: THREE.Scene) => {
-  const height = BIKE_HEIGHT * 0.7;
+  const height = BIKE_HEIGHT * TRAIL_HEIGHT_SCALE;
   const baseGeometry = new THREE.BoxGeometry(1, height, CONFIG.trailWidth);
   const baseMaterial = new THREE.MeshBasicMaterial({
     color: 0xffffff,
@@ -17,6 +18,7 @@ export const createTrailRenderer = (scene: THREE.Scene) => {
     blending: THREE.AdditiveBlending,
     depthTest: false,
     depthWrite: false,
+    fog: false,
     vertexColors: true,
   });
   baseMaterial.toneMapped = false;
